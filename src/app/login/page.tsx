@@ -1,9 +1,10 @@
 
 import { signIn } from "@/auth"
-export const dynamic = "force-dynamic";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookUp } from "lucide-react"
+
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
     return (
@@ -46,8 +47,6 @@ export default function LoginPage() {
                             Continuer avec Google
                         </Button>
                     </form>
-
-
 
                     <div className="text-center text-xs text-muted-foreground">
                         <p>En continuant, vous acceptez nos Conditions Générales et notre Politique de Confidentialité.</p>

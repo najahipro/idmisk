@@ -5,7 +5,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Clock, Package, Truck, ShoppingBag, AlertCircle, ArrowRight } from "lucide-react"
 
-// HADA HOWA L MO5ADDIR (Mra wa7da safi)
 export const dynamic = "force-dynamic";
 
 export default async function MyOrdersPage() {

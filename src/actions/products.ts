@@ -48,7 +48,7 @@ export async function addProduct(formData: FormData) {
                 category,
                 isFeatured,
                 showOnHome,
-                isNewArrival,  // <-- Zidtha hna 7it kant na9sa
+                isNewArrival,
                 isFreeShipping,
                 colors,
             },

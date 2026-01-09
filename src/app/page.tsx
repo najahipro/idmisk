@@ -7,7 +7,6 @@ import { db } from "@/lib/db";
 import { Product } from "@/types/product";
 import { getMainImage } from "@/lib/utils";
 
-// Correction: Mra wa7da
 export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {

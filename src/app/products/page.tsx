@@ -4,7 +4,6 @@ import { Product } from "@/types/product"
 import { getMainImage } from "@/lib/utils"
 import { ProductListClient } from "./product-list-client"
 
-// Correction: Mra wa7da lfo9
 export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
