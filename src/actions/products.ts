@@ -20,7 +20,6 @@ export async function addProduct(formData: FormData) {
         const stock = stockRaw ? parseInt(stockRaw) : 0
 
         const description = formData.get("description") as string || ""
-        // 'images' come as comma-separated string from the form
         const images = formData.get("images") as string
         const category = formData.get("category") as string
         const status = formData.get("status") as string || "active"
@@ -31,7 +30,6 @@ export async function addProduct(formData: FormData) {
         const isFreeShipping = formData.get("isFreeShipping") === "on"
         const colors = formData.get("colors") as string
 
-        // Validation
         if (!name || isNaN(price) || !images || !category) {
             console.log("Validation failed:", { name, price, images, category })
             return { error: "Champs requis manquants: Nom, Prix, Images ou Catégorie." }
@@ -50,6 +48,7 @@ export async function addProduct(formData: FormData) {
                 category,
                 isFeatured,
                 showOnHome,
+                isNewArrival,  // <-- Zidtha hna 7it kant na9sa
                 isFreeShipping,
                 colors,
             },

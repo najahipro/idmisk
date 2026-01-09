@@ -1,4 +1,5 @@
 import { db } from "@/lib/db"
+import { auth } from "@/auth"
 import { notFound } from "next/navigation"
 import { CheckCircle, Package, Truck, Home, MapPin, XCircle } from "lucide-react"
 import { cancelOrder } from "@/actions/orders"

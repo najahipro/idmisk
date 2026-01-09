@@ -1,7 +1,9 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DollarSign, Package, ShoppingCart, Users, ArrowUpRight } from "lucide-react"
 import { getDashboardStats, getGraphRevenue } from "@/actions/get-graph-revenue"
 import { Overview } from "@/components/admin/overview"
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import {
     Table,

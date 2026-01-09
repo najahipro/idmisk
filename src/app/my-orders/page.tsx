@@ -3,9 +3,10 @@ import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { CheckCircle, Clock, Package, Truck, ShoppingBag, AlertCircle, Eye, ArrowRight } from "lucide-react"
+import { CheckCircle, Clock, Package, Truck, ShoppingBag, AlertCircle, ArrowRight } from "lucide-react"
 
-export const dynamic = "force-dynamic"
+// HADA HOWA L MO5ADDIR (Mra wa7da safi)
+export const dynamic = "force-dynamic";
 
 export default async function MyOrdersPage() {
     const session = await auth()
@@ -75,8 +76,6 @@ export default async function MyOrdersPage() {
                                                 {order.total} DH
                                             </td>
                                             <td className="p-4 text-center">
-                                                {/* Redirect to a client component for details or dedicated page later */}
-                                                {/* For now keeping link same but it might need implementation */}
                                                 <Link href={`/orders/${order.id}`}>
                                                     <Button variant="outline" size="sm" className="gap-2 text-primary hover:text-primary border-primary/20 hover:border-primary">
                                                         Suivre
@@ -95,4 +94,3 @@ export default async function MyOrdersPage() {
         </div>
     )
 }
-

@@ -6,6 +6,8 @@ import { useSession } from "next-auth/react"
 import { OrderDetailsView } from "@/components/order/order-details-view"
 import { getUserOrders, type OrderDetails } from "@/lib/orders"
 import Link from "next/link"
+import { auth } from "@/auth"
+export const dynamic = "force-dynamic"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 

@@ -1,19 +1,17 @@
-
 import { Suspense } from "react"
 import { db } from "@/lib/db"
 import { Product } from "@/types/product"
 import { getMainImage } from "@/lib/utils"
 import { ProductListClient } from "./product-list-client"
 
-export const dynamic = "force-dynamic"
+// Correction: Mra wa7da lfo9
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
     const productsData = await db.product.findMany({
         orderBy: { createdAt: 'desc' }
     })
 
-    // Helper to map DB product to UI product
-    // We should probably move this helper to a utils file if used multiple places
     const mapToUiProduct = (p: any): Product => ({
         id: p.id,
         title: p.name,

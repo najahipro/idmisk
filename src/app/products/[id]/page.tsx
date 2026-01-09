@@ -1,7 +1,9 @@
 import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 import ProductDetails from "@/components/products/product-details"
+
 export const dynamic = "force-dynamic";
+
 
 interface ProductPageProps {
     params: Promise<{

@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { ProductsClient, Product } from "@/components/admin/products-client" // We'll create this next
 import { getMainImage } from "@/lib/utils"

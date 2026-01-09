@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { db } from "@/lib/db"
 import { OrdersClient } from "@/components/admin/orders-client"
 
