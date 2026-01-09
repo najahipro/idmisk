@@ -1,18 +1,30 @@
-import { auth } from "@/auth"
-import { db } from "@/lib/db"
-import { redirect } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, Clock, Package, Truck, ShoppingBag, AlertCircle, ArrowRight } from "lucide-react"
+import { unstable_noStore as noStore } from "next/cache";
+import { auth } from "@/auth";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { 
+    CheckCircle, 
+    Clock, 
+    Package, 
+    Truck, 
+    ShoppingBag, 
+    AlertCircle, 
+    ArrowRight 
+} from "lucide-react";
 
-// HADA HOWA CODE S7I7: We7da safi, lfo9
+// 1. FORCE DYNAMIC (Mra we7da)
 export const dynamic = "force-dynamic";
 
 export default async function MyOrdersPage() {
-    const session = await auth()
+    // 2. DWA DYAL ERROR (Had l-commande katmn3 caching f wa9t l-build)
+    noStore();
+
+    const session = await auth();
 
     if (!session || !session.user?.email) {
-        redirect("/login")
+        redirect("/login");
     }
 
     try {
@@ -23,18 +35,18 @@ export default async function MyOrdersPage() {
             orderBy: {
                 createdAt: 'desc'
             }
-        })
+        });
 
         const getStatusBadge = (status: string) => {
-            const s = status.toLowerCase()
-            if (s.includes('attente')) return <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Clock className="w-3 h-3" /> {status}</span>
-            if (s.includes('cours') || s.includes('préparation')) return <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Package className="w-3 h-3" /> {status}</span>
-            if (s.includes('expédié')) return <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Truck className="w-3 h-3" /> {status}</span>
-            if (s.includes('livré')) return <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><CheckCircle className="w-3 h-3" /> {status}</span>
-            if (s.includes('annulé')) return <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><AlertCircle className="w-3 h-3" /> {status}</span>
+            const s = status.toLowerCase();
+            if (s.includes('attente')) return <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Clock className="w-3 h-3" /> {status}</span>;
+            if (s.includes('cours') || s.includes('préparation')) return <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Package className="w-3 h-3" /> {status}</span>;
+            if (s.includes('expédié')) return <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><Truck className="w-3 h-3" /> {status}</span>;
+            if (s.includes('livré')) return <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><CheckCircle className="w-3 h-3" /> {status}</span>;
+            if (s.includes('annulé')) return <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full flex items-center gap-1 w-fit"><AlertCircle className="w-3 h-3" /> {status}</span>;
 
-            return <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full w-fit">{status}</span>
-        }
+            return <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full w-fit">{status}</span>;
+        };
 
         return (
             <div className="min-h-screen bg-gray-50/50 py-12">
@@ -93,9 +105,10 @@ export default async function MyOrdersPage() {
                     )}
                 </div>
             </div>
-        )
+        );
     } catch (error) {
-        console.error("Database error:", error);
-        return <div className="p-8 text-center text-red-500">Une erreur est survenue lors du chargement des commandes.</div>
+        // Hada howa l-Parachute: Ila w9a3 mochkil f build, ma tferga3ch l page
+        console.error("Error fetching orders:", error);
+        return <div className="p-10 text-center">Erreur de chargement des commandes. Veuillez réessayer.</div>;
     }
 }
