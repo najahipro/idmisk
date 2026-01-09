@@ -44,7 +44,7 @@ const CATEGORIES = [
 
 const formSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
-    description: z.string().default(""),
+    description: z.string(),
     price: z.coerce.number().min(1, "Le prix est requis"),
     compareAtPrice: z.coerce.number().optional(),
     stock: z.coerce.number().default(0),
@@ -105,7 +105,7 @@ export function ProductForm() {
 
         formData.append("stock", values.stock.toString())
         formData.append("category", values.category)
-        formData.append("image", values.image || "")
+        formData.append("images", values.images || "")
         formData.append("colors", values.colors || "")
         formData.append("status", values.status)
         formData.append("isFeatured", values.isFeatured ? "on" : "off")
@@ -189,7 +189,7 @@ export function ProductForm() {
                             <CardContent>
                                 <FormField
                                     control={form.control}
-                                    name="image"
+                                    name="images"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormControl>
@@ -208,7 +208,7 @@ export function ProductForm() {
                                                             className="absolute top-2 right-2"
                                                             onClick={() => {
                                                                 field.onChange("")
-                                                                form.setValue("image", "", { shouldValidate: true, shouldDirty: true })
+                                                                form.setValue("images", "", { shouldValidate: true, shouldDirty: true })
                                                             }}
                                                         >
                                                             <Trash className="h-4 w-4" />
@@ -223,11 +223,11 @@ export function ProductForm() {
                                                                 const latestUrl = Array.isArray(url) ? url[url.length - 1] : url
                                                                 console.log("Image Uploaded (Latest):", latestUrl)
                                                                 field.onChange(latestUrl)
-                                                                form.setValue("image", latestUrl, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+                                                                form.setValue("images", latestUrl, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
                                                             }}
                                                             onRemove={() => {
                                                                 field.onChange("")
-                                                                form.setValue("image", "", { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+                                                                form.setValue("images", "", { shouldValidate: true, shouldDirty: true, shouldTouch: true })
                                                             }}
                                                         />
                                                         <Button
@@ -239,7 +239,7 @@ export function ProductForm() {
                                                                 const fakeUrl = "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg"
                                                                 console.log("Forcing Fake Image:", fakeUrl)
                                                                 field.onChange(fakeUrl)
-                                                                form.setValue("image", fakeUrl, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+                                                                form.setValue("images", fakeUrl, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
                                                             }}
                                                         >
                                                             ⚠️ DEBUG: Force Test Image
@@ -251,7 +251,7 @@ export function ProductForm() {
                                                                     className="text-xs h-8 pr-8"
                                                                     onChange={(e) => {
                                                                         field.onChange(e.target.value)
-                                                                        form.setValue("image", e.target.value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+                                                                        form.setValue("images", e.target.value, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
                                                                     }}
                                                                 />
                                                             </div>

@@ -6,7 +6,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -36,7 +36,7 @@
     "recharts": "^3.6.0",
     "resend": "^6.7.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.5"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@prisma/client": "^5.22.0",

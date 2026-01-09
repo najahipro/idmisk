@@ -86,7 +86,7 @@ export function CartSheet() {
                 setIsOpen(false)
                 setIsSuccess(false)
                 setIsCheckingOut(false)
-                setFormData({ name: "", phone: "", city: "", address: "" })
+                setFormData({ name: "", email: "", phone: "", city: "", address: "" })
                 // Maybe redirect to a thank you page or order details if implemented
                 // router.push(`/commande/${encodeURIComponent(result.orderId)}`)
             }, 1500)

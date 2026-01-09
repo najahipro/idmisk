@@ -1,4 +1,4 @@
-import { INITIAL_PRODUCTS } from "@/context/product-context"
+import { db } from "@/lib/db"
 
 export interface Order {
     id: string
@@ -27,8 +27,8 @@ export async function getDashboardStats() {
 
     const totalOrders = MOCK_ORDERS.length
 
-    // In a real app, we would fetch from DB, but here we use the seeded constant
-    const totalProducts = INITIAL_PRODUCTS.length
+    // Fetch real product count from DB
+    const totalProducts = await db.product.count()
 
     return {
         revenue: totalRevenue.toFixed(2),

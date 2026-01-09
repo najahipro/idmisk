@@ -46,12 +46,10 @@ export async function addProduct(formData: FormData) {
                 stock,
                 status,
                 description,
-                images, // Save directly as string
+                images,
                 category,
                 isFeatured,
                 showOnHome,
-                showOnHome,
-                isNewArrival,
                 isFreeShipping,
                 colors,
             },

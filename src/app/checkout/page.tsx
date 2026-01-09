@@ -39,7 +39,7 @@ export default function CheckoutPage() {
         setIsMounted(true)
     }, [])
 
-    const shippingCost = city === "Casablanca" ? 20 : 35
+    const shippingCost: number = city === "Casablanca" ? 20 : 35
     const total = subtotal + shippingCost
 
     if (!isMounted) return null

@@ -34,7 +34,7 @@ interface Collection {
     title: string
     imageUrl: string
     categoryKey: string
-    order: int
+    order: number
 }
 
 interface CollectionManagerProps {

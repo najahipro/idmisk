@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, Tajawal } from "next/font/google"; // Import Tajawal
+import { Inter, Tajawal } from "next/font/google"; // Import Tajawal
 import "./globals.css";
 import { CartProvider } from "@/context/cart-context";
 
@@ -15,7 +15,7 @@ import { Footer } from "@/components/landing/footer";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+// const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 const tajawal = Tajawal({ subsets: ["arabic"], weight: ["400", "500", "700"], variable: "--font-arabic" });
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="fr" suppressHydrationWarning>
-            <body className={`${inter.variable} ${playfair.variable} ${tajawal.variable} font-sans bg-background text-foreground antialiased`}>
+            <body className={`${inter.variable} ${tajawal.variable} font-sans bg-background text-foreground antialiased`}>
                 <I18nProvider>
                     <CurrencyProvider>
                         <SessionProvider>
