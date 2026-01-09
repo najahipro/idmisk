@@ -1,0 +1,32 @@
+{
+    "Navigation": {
+        "home": "Home",
+        "shop": "Shop",
+        "about": "Our Story",
+        "contact": "Contact",
+        "admin": "Admin"
+    },
+    "Common": {
+        "addToCart": "Add to Cart",
+        "buyNow": "Buy Now",
+        "price": "Price",
+        "new": "New",
+        "search": "Search",
+        "cart": "Cart",
+        "checkout": "Checkout",
+        "items": "{count, plural, =0 {No items} one {1 item} other {# items}}",
+        "loading": "Loading..."
+    },
+    "Product": {
+        "description": "Description",
+        "shipping": "Shipping",
+        "returns": "Returns policy"
+    },
+    "Footer": {
+        "about": "About IDMISK",
+        "quickLinks": "Quick Links",
+        "newsletter": "Newsletter",
+        "subscribe": "Subscribe",
+        "rights": "All rights reserved"
+    }
+}

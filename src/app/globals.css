@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #fdfbf7; /* Very Light Cream */
+    --foreground: #333333; /* Dark Charcoal */
+    
+    --primary: #7da2a9;    /* Dusty Blue */
+    --secondary: #aebfa3;  /* Soft Sage */
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+}

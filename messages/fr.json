@@ -1,0 +1,32 @@
+{
+    "Navigation": {
+        "home": "Accueil",
+        "shop": "Boutique",
+        "about": "Notre Histoire",
+        "contact": "Contact",
+        "admin": "Admin"
+    },
+    "Common": {
+        "addToCart": "Ajouter au Panier",
+        "buyNow": "Achat Rapide",
+        "price": "Prix",
+        "new": "Nouveau",
+        "search": "Rechercher",
+        "cart": "Panier",
+        "checkout": "Commander",
+        "items": "{count, plural, =0 {Aucun article} one {1 article} other {# articles}}",
+        "loading": "Chargement..."
+    },
+    "Product": {
+        "description": "Description",
+        "shipping": "Livraison",
+        "returns": "Politique de retour"
+    },
+    "Footer": {
+        "about": "À propos d'IDMISK",
+        "quickLinks": "Liens Rapides",
+        "newsletter": "Newsletter",
+        "subscribe": "S'abonner",
+        "rights": "Tous droits réservés"
+    }
+}
