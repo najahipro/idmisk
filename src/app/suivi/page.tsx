@@ -2,8 +2,21 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { db } from "@/lib/db"
 import { OrderCard, OrderType } from "@/components/order-card"
-import { Search, ShoppingBag } from "lucide-react"
+import { Search, ShoppingBag, ArrowRight, Eye, Clock, CheckCircle, Truck, XCircle, Home } from "lucide-react"
 import { redirect } from "next/navigation"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { fr } from "date-fns/locale"
+import Link from "next/link"
 
 export const dynamic = "force-dynamic"
 
@@ -15,16 +28,12 @@ interface SuiviPageProps {
 
 export default async function SuiviPage({ searchParams }: SuiviPageProps) {
     const { phone } = await searchParams
-    let orders: OrderType[] = [] // explicitly typed
+    let orders: OrderType[] = []
     let hasSearched = false
 
     if (phone) {
         hasSearched = true
-        // Normalize phone search if needed, strictly partial match or exact?
-        // Let's do exact match for now as requested "via ONLY their Phone Number"
-        // But users might format differently. Let's start with contains or exact.
-        // Prisma SQLite 'contains' is easy.
-
+        // Normalize phone search if needed
         const rawOrders = await db.order.findMany({
             where: {
                 customerPhone: {
@@ -36,10 +45,9 @@ export default async function SuiviPage({ searchParams }: SuiviPageProps) {
             }
         })
 
-        // Cast to OrderType (ensure items is string)
+        // Cast to OrderType
         orders = rawOrders.map(o => ({
             ...o,
-            // safety check if schema differs in future
             items: o.items
         })) as OrderType[]
 
@@ -57,9 +65,19 @@ export default async function SuiviPage({ searchParams }: SuiviPageProps) {
         }
     }
 
+    const getStatusColor = (status: string) => {
+        const s = status.toLowerCase()
+        if (s.includes('attente')) return "bg-yellow-100 text-yellow-800"
+        if (s.includes('cours')) return "bg-blue-100 text-blue-800"
+        if (s.includes('expédié')) return "bg-purple-100 text-purple-800"
+        if (s.includes('livré')) return "bg-green-100 text-green-800"
+        if (s.includes('annulé')) return "bg-red-100 text-red-800"
+        return "bg-gray-100 text-gray-800"
+    }
+
     return (
         <div className="min-h-screen bg-gray-50/50 py-12">
-            <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+            <div className="container mx-auto px-4 md:px-6 max-w-3xl">
 
                 <div className="text-center mb-10">
                     <h1 className="text-3xl font-serif font-bold text-foreground mb-4">Suivi de Commande</h1>
@@ -92,10 +110,44 @@ export default async function SuiviPage({ searchParams }: SuiviPageProps) {
                                     <ShoppingBag className="w-5 h-5" />
                                     {orders.length} commande{orders.length > 1 ? 's' : ''} trouvée{orders.length > 1 ? 's' : ''}
                                 </h2>
-                                <div className="space-y-6">
-                                    {orders.map(order => (
-                                        <OrderCard key={order.id} order={order} href={`/suivi/${order.id}`} />
-                                    ))}
+
+                                <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+                                    <Table>
+                                        <TableHeader className="bg-gray-50">
+                                            <TableRow>
+                                                <TableHead>Commande</TableHead>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Statut</TableHead>
+                                                <TableHead className="text-right">Total</TableHead>
+                                                <TableHead className="w-[100px]"></TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {orders.map((order) => (
+                                                <TableRow key={order.id} className="group hover:bg-gray-50/50">
+                                                    <TableCell className="font-mono font-medium">#{order.id.slice(0, 8)}</TableCell>
+                                                    <TableCell className="text-muted-foreground">
+                                                        {format(new Date(order.createdAt), "dd/MM/yyyy", { locale: fr })}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Badge variant="secondary" className={cn("font-normal border-0", getStatusColor(order.status))}>
+                                                            {order.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-medium">
+                                                        {order.total} DH
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Link href={`/suivi/${order.id}`}>
+                                                            <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                                                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                            </Button>
+                                                        </Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             </>
                         ) : (
