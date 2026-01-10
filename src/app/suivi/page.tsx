@@ -26,7 +26,14 @@ interface SuiviPageProps {
     }>
 }
 
+import { auth } from "@/auth"
+
 export default async function SuiviPage({ searchParams }: SuiviPageProps) {
+    const session = await auth()
+    if (session?.user) {
+        redirect("/my-orders")
+    }
+
     const { phone } = await searchParams
     let orders: OrderType[] = []
     let hasSearched = false
