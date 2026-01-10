@@ -80,6 +80,8 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
                 if (!title.includes('khimar')) return false
             } else if (cat === 'accessoire') {
                 if (!title.includes('bonnet') && !title.includes('accessoire') && !title.includes('épingle')) return false
+            } else if (cat === 'abaya') {
+                if (!title.includes('abaya')) return false
             }
         }
 

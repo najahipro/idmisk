@@ -71,8 +71,8 @@ export async function Moodboard() {
                             style={{ backgroundImage: `url(${item.imageUrl || "/id.jpg"})` }}
                         />
 
-                        {/* Overlay: Stronger at bottom for text readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+                        {/* Overlay: Stronger at bottom for text readability - User Requested Specific Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-90 transition-opacity" />
 
                         {/* Content: Centered Text on Mobile for Impact */}
                         <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end items-center md:items-start text-center md:text-left">
@@ -80,8 +80,8 @@ export async function Moodboard() {
                                 <p className="text-white/80 text-xs md:text-sm font-medium uppercase tracking-wider mb-1 md:mb-2">
                                     Collection
                                 </p>
-                                <h3 className="text-white text-3xl md:text-3xl font-serif font-bold flex items-center justify-center md:justify-start gap-2">
-                                    <span className="drop-shadow-md">{item.title}</span>
+                                <h3 className="text-white text-3xl md:text-3xl font-serif font-bold flex items-center justify-center md:justify-start gap-2 drop-shadow-lg">
+                                    {item.title}
                                     <ArrowUpRight className="hidden md:block w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-white" />
                                 </h3>
                             </div>
