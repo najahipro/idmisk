@@ -40,8 +40,8 @@ export async function Moodboard() {
     // Index 3 (Order 4) -> Wide (col-span-2 row-span-1)
 
     return (
-        <section className="container mx-auto px-4 md:px-6 py-12">
-            <div className="flex flex-col items-start mb-8 md:mb-12">
+        <section className="container mx-auto px-0 md:px-6 py-8 md:py-12">
+            <div className="flex flex-col items-start mb-6 md:mb-12 px-4 md:px-0">
                 <span className="text-sm font-medium text-primary tracking-widest uppercase mb-2">
                     Explorer
                 </span>
@@ -50,40 +50,39 @@ export async function Moodboard() {
                 </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 h-[1200px] md:h-[600px]">
+            {/* Edge-to-Edge Grid on Mobile (gap-1, full width) */}
+            <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-1 md:gap-4 h-auto md:h-[600px]">
                 {items.map((item, index) => (
                     <Link
                         key={item.id || index}
                         href={getLink(item.categoryKey)}
                         className={cn(
-                            "group relative overflow-hidden rounded-xl bg-muted",
+                            "group relative overflow-hidden bg-muted block",
+                            // Mobile: Aspect Video (Full Width Landscape)
+                            "aspect-video md:aspect-auto",
                             index === 0 && "md:col-span-2 md:row-span-2", // Slot 1
                             index === 3 && "md:col-span-2 md:row-span-1", // Slot 4
                             (index === 1 || index === 2) && "md:col-span-1 md:row-span-1" // Slots 2 & 3
                         )}
                     >
                         {/* Background Image */}
-                        {/* Use Main Image helper if needed, or direct URL. Assuming URL is clean. */}
-                        {/* Note: item.imageUrl might be empty if saved without image. Fallback to placeholder. */}
                         <div
                             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                             style={{ backgroundImage: `url(${item.imageUrl || "/id.jpg"})` }}
                         />
-                        {/* Fallback to Next/Image if valid URL? style bg is easier for user-uploaded diverse URLs without width/height knowledge */}
 
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+                        {/* Overlay: Stronger at bottom for text readability */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
 
-                        {/* Content */}
-                        <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
-                            <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                <p className="text-white/80 text-xs md:text-sm font-medium uppercase tracking-wider mb-2">
-                                    {/* Subtitle is not in DB model, skipping or static? Model didn't have subtitle. Removing or Static. */}
+                        {/* Content: Centered Text on Mobile for Impact */}
+                        <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end items-center md:items-start text-center md:text-left">
+                            <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300 w-full">
+                                <p className="text-white/80 text-xs md:text-sm font-medium uppercase tracking-wider mb-1 md:mb-2">
                                     Collection
                                 </p>
-                                <h3 className="text-white text-2xl md:text-3xl font-serif font-bold flex items-center gap-2">
-                                    {item.title}
-                                    <ArrowUpRight className="w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-white" />
+                                <h3 className="text-white text-3xl md:text-3xl font-serif font-bold flex items-center justify-center md:justify-start gap-2">
+                                    <span className="drop-shadow-md">{item.title}</span>
+                                    <ArrowUpRight className="hidden md:block w-5 h-5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-white" />
                                 </h3>
                             </div>
                         </div>
