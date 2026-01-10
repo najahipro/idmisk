@@ -6,14 +6,16 @@ import { cn } from "@/lib/utils"
 import { ChevronLeft, ChevronRight, Play } from "lucide-react"
 
 interface ProductGalleryProps {
-    images: string // Comma separated URL string
+    images: string | string[] // Array or Comma separated URL string
 }
 
 export function ProductGallery({ images }: ProductGalleryProps) {
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     // Parse images string to array
-    const mediaList = images ? images.split(",").map(url => url.trim()).filter(Boolean) : []
+    const mediaList = Array.isArray(images)
+        ? images
+        : (images ? images.split(",").map(url => url.trim()).filter(Boolean) : [])
 
     // If no images, show placeholder
     if (mediaList.length === 0) {

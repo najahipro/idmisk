@@ -1,98 +1,118 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
-import { useSession } from "next-auth/react"
-import { useState } from "react"
-import Link from "next/link"
-import { getOrderByPhone, type OrderDetails } from "@/lib/orders"
-import { OrderDetailsView } from "@/components/order/order-details-view"
-import { Loader2, Search, ArrowLeft } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { db } from "@/lib/db"
+import { OrderCard, OrderType } from "@/components/order-card"
+import { Search, ShoppingBag } from "lucide-react"
+import { redirect } from "next/navigation"
 
-export default function TrackingPage() {
-    const { data: session } = useSession()
+export const dynamic = "force-dynamic"
 
-    const [phone, setPhone] = useState("")
-    const [loading, setLoading] = useState(false)
-    const [order, setOrder] = useState<OrderDetails | null>(null) // Explicitly type as OrderDetails | null
-    const [error, setError] = useState("")
+interface SuiviPageProps {
+    searchParams: Promise<{
+        phone?: string
+    }>
+}
 
-    // Redirect logic removed as it is handled in the Header component
+export default async function SuiviPage({ searchParams }: SuiviPageProps) {
+    const { phone } = await searchParams
+    let orders: OrderType[] = [] // explicitly typed
+    let hasSearched = false
 
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!phone) return
+    if (phone) {
+        hasSearched = true
+        // Normalize phone search if needed, strictly partial match or exact?
+        // Let's do exact match for now as requested "via ONLY their Phone Number"
+        // But users might format differently. Let's start with contains or exact.
+        // Prisma SQLite 'contains' is easy.
 
-        setLoading(true)
-        setError("")
-        setOrder(null)
-
-        try {
-            const result = await getOrderByPhone(phone)
-            if (result) {
-                setOrder(result)
-            } else {
-                setError("Aucune commande trouvée avec ce numéro (Essayer mock: 0600...)")
+        const rawOrders = await db.order.findMany({
+            where: {
+                customerPhone: {
+                    contains: phone.trim()
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
-        } catch (err) {
-            setError("Une erreur est survenue.")
-        } finally {
-            setLoading(false)
+        })
+
+        // Cast to OrderType (ensure items is string)
+        orders = rawOrders.map(o => ({
+            ...o,
+            // safety check if schema differs in future
+            items: o.items
+        })) as OrderType[]
+
+        // Smart Redirection: If only 1 order, go straight to details
+        if (orders.length === 1) {
+            redirect(`/suivi/${orders[0].id}`)
         }
     }
 
-    const resetSearch = () => {
-        setOrder(null)
-        setPhone("")
-        setError("")
+    async function searchAction(formData: FormData) {
+        "use server"
+        const phone = formData.get("phone") as string
+        if (phone) {
+            redirect(`/suivi?phone=${encodeURIComponent(phone)}`)
+        }
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
-            <header className="border-b bg-white/50 backdrop-blur p-4">
-                <div className="container mx-auto flex items-center justify-between">
-                    <h1 className="font-serif text-xl font-bold text-primary">IDMISK Suivi</h1>
-                    {order && (
-                        <Button variant="ghost" size="sm" onClick={resetSearch}>
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Nouvelle recherche
-                        </Button>
-                    )}
+        <div className="min-h-screen bg-gray-50/50 py-12">
+            <div className="container mx-auto px-4 md:px-6 max-w-2xl">
+
+                <div className="text-center mb-10">
+                    <h1 className="text-3xl font-serif font-bold text-foreground mb-4">Suivi de Commande</h1>
+                    <p className="text-muted-foreground">
+                        Entrez votre numéro de téléphone pour voir l'état de vos commandes.
+                    </p>
                 </div>
-            </header>
 
-            <main className="flex-1 container mx-auto px-4 py-8 md:py-12 max-w-4xl">
-                {order ? (
-                    <OrderDetailsView order={order} isGuest />
-                ) : (
-                    <div className="max-w-xl mx-auto bg-white rounded-xl shadow-sm border p-6 md:p-8 space-y-8">
-                        <div className="text-center space-y-2">
-                            <h1 className="text-2xl font-bold font-serif">Suivre votre commande</h1>
-                            <p className="text-muted-foreground">Entrez votre numéro de téléphone pour voir l'état de votre colis (Mode Invité).</p>
-                        </div>
+                <div className="bg-white p-6 rounded-xl border shadow-sm mb-10">
+                    <form action={searchAction} className="flex gap-3">
+                        <Input
+                            name="phone"
+                            type="tel"
+                            placeholder="Ex: 0612345678"
+                            defaultValue={phone}
+                            required
+                            className="flex-1 h-12 text-lg"
+                        />
+                        <Button type="submit" size="lg" className="h-12 px-8">
+                            <Search className="w-4 h-4 mr-2" /> Suivre
+                        </Button>
+                    </form>
+                </div>
 
-                        <form onSubmit={handleSearch} className="space-y-4">
-                            <div className="flex gap-2">
-                                <input
-                                    type="tel"
-                                    placeholder="06 00 00 00 00"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    className="flex-1 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                />
-                                <Button type="submit" disabled={loading}>
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Voir le statut"}
-                                </Button>
+                {hasSearched && (
+                    <div className="space-y-6">
+                        {orders.length > 0 ? (
+                            <>
+                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                    <ShoppingBag className="w-5 h-5" />
+                                    {orders.length} commande{orders.length > 1 ? 's' : ''} trouvée{orders.length > 1 ? 's' : ''}
+                                </h2>
+                                <div className="space-y-6">
+                                    {orders.map(order => (
+                                        <OrderCard key={order.id} order={order} href={`/suivi/${order.id}`} />
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12 bg-white rounded-xl border border-dashed">
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Search className="w-6 h-6 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-lg font-medium mb-1">Aucune commande trouvée</h3>
+                                <p className="text-muted-foreground">
+                                    Aucune commande associée au numéro "{phone}". <br />
+                                    Vérifiez le numéro et réessayez.
+                                </p>
                             </div>
-                            {error && <p className="text-sm text-red-500 font-medium text-center">{error}</p>}
-                        </form>
-
-                        <div className="text-center text-sm pt-4 border-t">
-                            <Link href="/login" className="text-primary hover:underline">
-                                Se connecter pour voir mon historique
-                            </Link>
-                        </div>
+                        )}
                     </div>
                 )}
-            </main>
+            </div>
         </div>
-    );
+    )
 }

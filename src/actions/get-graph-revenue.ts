@@ -54,8 +54,11 @@ export async function getDashboardStats() {
     })
 
     const salesCount = await db.order.count()
-    const stockCount = await db.product.count()
-    const activeAmbassadors = 3 // Still mock for now as we don't have ambassador system
+    const stockCount = await db.product.count({
+        where: { status: 'active', stock: { gt: 0 } }
+    });
+
+    const activeAmbassadors = 0; // No User model yet
 
     return {
         totalRevenue: totalRevenue._sum.total || 0,

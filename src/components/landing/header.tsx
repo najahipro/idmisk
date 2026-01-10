@@ -206,9 +206,9 @@ export function Header() {
                             </Link>
                         </Button>
                     )}
-                    <Link href="/my-orders" className="text-foreground/70 hover:text-primary transition-colors">
+                    <Link href="/suivi" className="text-foreground/70 hover:text-primary transition-colors">
                         <Truck className="h-5 w-5" />
-                        <span className="sr-only">Suivre ma commande</span>
+                        <span className="sr-only">Suivi de commande</span>
                     </Link>
                     <button
                         onClick={() => setIsOpen(true)}

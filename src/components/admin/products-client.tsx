@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trash, RefreshCw, MoreHorizontal, ArrowUpDown, ImageOff } from "lucide-react"
+import { Trash, RefreshCw, MoreHorizontal, ArrowUpDown, ImageOff, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/navigation"
@@ -18,7 +18,7 @@ export type Product = {
     name: string
     price: number
     category: string
-    images: string
+    images: string | string[]
     isFeatured: boolean
     createdAt: Date
 }
@@ -48,8 +48,16 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             accessorKey: "images",
             header: "Image",
             cell: ({ row }) => {
-                const image = row.original.images
-                const imageUrl = getMainImage(image)
+                const images = row.original.images
+                let imageUrl = ""
+
+                // Safe handling for string[] (Schema V2) or string (Schema V1 legacy)
+                if (Array.isArray(images) && images.length > 0) {
+                    imageUrl = images[0]
+                } else if (typeof images === 'string') {
+                    // Legacy fallback
+                    imageUrl = images.split(',')[0]
+                }
 
                 return (
                     <div className="relative h-12 w-12 rounded overflow-hidden bg-muted border">
@@ -92,7 +100,6 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             header: "Prix",
             cell: ({ row }) => {
                 const price = parseFloat(row.getValue("price"))
-                // Format currency could be imported but let's simple render
                 return <div className="font-medium">{price} DH</div>
             }
         },
@@ -110,9 +117,14 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             cell: ({ row }) => {
                 const product = row.original
                 return (
-                    <Button variant="destructive" size="sm" onClick={() => handleDelete(product.id)}>
-                        <Trash className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => router.push(`/admin/products/${product.id}`)}>
+                            <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDelete(product.id)}>
+                            <Trash className="h-4 w-4" />
+                        </Button>
+                    </div>
                 )
             }
         }

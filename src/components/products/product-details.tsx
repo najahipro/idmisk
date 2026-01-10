@@ -21,13 +21,12 @@ import { useCart } from "@/context/cart-context"
 import { useCurrency } from "@/context/currency-context"
 import { Product } from "@prisma/client"
 
-// Custom type extending Prisma Product to include new fields before client regeneration
-interface ExtendedProduct extends Partial<Product> {
+interface ExtendedProduct extends Omit<Partial<Product>, 'images'> {
     id: string
     name: string
     price: number
     description: string
-    images?: string
+    images?: string | string[] // Flexible Type
     category: string
     isFeatured?: boolean
     isNewArrival?: boolean
@@ -53,7 +52,23 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
     const [quantity, setQuantity] = useState(1)
 
     // Images handling
-    const mainImage = product.images || "/placeholder.jpg"
+    let imageList: string[] = []
+    if (Array.isArray(product.images)) {
+        imageList = product.images
+    } else if (typeof product.images === 'string') {
+        try {
+            // Try JSON first
+            const parsed = JSON.parse(product.images)
+            imageList = Array.isArray(parsed) ? parsed : [parsed]
+        } catch (e) {
+            // Fallback CSV
+            imageList = product.images.split(',').map(s => s.trim()).filter(Boolean)
+        }
+    }
+
+    // Pass normalized list to gallery
+    const imagesForGallery = imageList.length > 0 ? imageList : ["/placeholder.jpg"]
+    const mainImage = imagesForGallery[0]
 
     const handleAddToCart = () => {
         addItem({
@@ -196,7 +211,7 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                             <Link href={`/products/${item.id}`} className="block">
                                 <div className="relative aspect-square bg-muted/20 rounded-sm overflow-hidden mb-3">
                                     <Image
-                                        src={item.images || "/placeholder.jpg"}
+                                        src={(item.images && item.images.length > 0) ? item.images[0] : "/placeholder.jpg"}
                                         alt={item.name}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
