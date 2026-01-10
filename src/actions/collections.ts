@@ -20,6 +20,7 @@ export async function upsertHomeCollection(formData: FormData) {
     const title = formData.get("title") as string
     const imageUrl = formData.get("imageUrl") as string
     const categoryKey = formData.get("categoryKey") as string
+    const customUrl = formData.get("customUrl") as string
     const order = parseInt(formData.get("order") as string)
 
     console.log("Upserting Collection:", {

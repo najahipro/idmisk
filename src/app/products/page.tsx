@@ -24,7 +24,10 @@ export default async function ProductsPage() {
         showSalesCount: false,
         rating: 0,
         colors: [],
-        description: p.description
+        colors: [],
+        description: p.description,
+        originalCategory: p.category,
+        customCategorySlug: p.customCategorySlug
     })
 
     const initialProducts = productsData.map(mapToUiProduct)

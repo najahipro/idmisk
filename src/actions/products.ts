@@ -130,7 +130,9 @@ export async function updateProduct(productId: string, formData: FormData) {
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
+                isFreeShipping,
                 colors,
+                customCategorySlug: formData.get("customCategorySlug") as string,
             },
         })
 

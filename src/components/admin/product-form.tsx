@@ -53,7 +53,10 @@ const formSchema = z.object({
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
+    isFreeShipping: z.boolean().default(false),
+    isFreeShipping: z.boolean().default(false),
     colors: z.string().optional(), // Comma separated
+    customCategorySlug: z.string().optional(),
 })
 
 type ProductFormValues = z.infer<typeof formSchema>
@@ -76,6 +79,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
         price: parseFloat(String(initialData.price)),
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
+        customCategorySlug: initialData.customCategorySlug || "",
     } : {
         name: "",
         description: "",
@@ -89,6 +93,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
         isNewArrival: false,
         isFreeShipping: false,
         colors: "",
+        customCategorySlug: "",
     }
 
     const form = useForm<ProductFormValues>({
@@ -111,6 +116,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
         formData.append("stock", values.stock.toString())
         formData.append("category", values.category)
+        formData.append("customCategorySlug", values.customCategorySlug || "")
 
         // Serialiser le tableau d'images en JSON pour l'envoyer proprement
         formData.append("images", JSON.stringify(values.images))

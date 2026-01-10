@@ -19,15 +19,15 @@ import { Loader2, Save, Trash } from "lucide-react"
 
 // Available categories for filtering
 const CATEGORIES = [
-    { label: "Soie de Médine", value: "Soie de Médine" },
-    { label: "Jersey Luxe", value: "Jersey Luxe" },
-    { label: "Crêpe Premium", value: "Crêpe Premium" },
-    { label: "Mousseline", value: "Mousseline" },
+    { label: "Soie de Médine", value: "soie" },
+    { label: "Jersey Luxe", value: "jersey" },
+    { label: "Crêpe Premium", value: "crepe" },
+    { label: "Mousseline", value: "mousseline" },
     { label: "Hijabs (Tout)", value: "hijab" },
     { label: "Khimars", value: "khimar" },
     { label: "Abayas", value: "abaya" },
-    { label: "Packs", value: "Packs" },
-    { label: "Accessoires", value: "Accessoires" },
+    { label: "Packs", value: "packs" },
+    { label: "Accessoires", value: "accessoires" },
     { label: "Toutes les catégories", value: "all" },
     { label: "Nouveautés (Tri)", value: "newest" }, // Special handle for URL
 ]
@@ -37,6 +37,7 @@ interface Collection {
     title: string
     imageUrl: string
     categoryKey: string
+    customUrl?: string | null
     order: number
 }
 
@@ -57,6 +58,7 @@ export function CollectionManager({ initialCollections }: CollectionManagerProps
             title: "",
             imageUrl: "",
             categoryKey: "",
+            customUrl: "",
             order: order
         }
     }
@@ -71,6 +73,7 @@ export function CollectionManager({ initialCollections }: CollectionManagerProps
         formData.append("title", data.title || existing.title || "")
         formData.append("imageUrl", data.imageUrl || existing.imageUrl || "")
         formData.append("categoryKey", data.categoryKey || existing.categoryKey || "")
+        formData.append("customUrl", data.customUrl || existing.customUrl || "")
         formData.append("order", order.toString())
 
         try {
@@ -112,13 +115,14 @@ function CollectionCard({ order, collection, onSave, loading }: {
     const [title, setTitle] = useState(collection.title)
     const [imageUrl, setImageUrl] = useState(collection.imageUrl)
     const [categoryKey, setCategoryKey] = useState(collection.categoryKey)
+    const [customUrl, setCustomUrl] = useState(collection.customUrl)
 
     // Update state when prop changes (if DB updates in background, though router.refresh handles this)
     // We rely on initial state for simplicity, assuming page reload on save or router.refresh re-renders the component tree.
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        onSave({ title, imageUrl, categoryKey })
+        onSave({ title, imageUrl, categoryKey, customUrl })
     }
 
     return (
@@ -208,6 +212,17 @@ function CollectionCard({ order, collection, onSave, loading }: {
                             ))}
                         </SelectContent>
                     </Select>
+                </div>
+
+                <div className="space-y-3">
+                    <Label className="text-base font-semibold">Lien Personnalisé (Optionnel)</Label>
+                    <Input
+                        value={customUrl || ""}
+                        onChange={(e) => setCustomUrl(e.target.value)}
+                        placeholder="Ex: /products?fabric=soie ou https://..."
+                        className="h-10"
+                    />
+                    <p className="text-xs text-muted-foreground">Si rempli, ce lien écrase la catégorie sélectionnée.</p>
                 </div>
 
                 <div className="pt-6 mt-auto">

@@ -39,50 +39,73 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
         else setSearchQuery(null) // Clear if param removed
     }, [searchParams])
 
+    // Helper: Smart Slugify
+    const slugify = (text: string) => {
+        return text
+            .toString()
+            .toLowerCase()
+            .trim()
+            .normalize("NFD") // Split accents
+            .replace(/[\u0300-\u036f]/g, "") // Remove accents
+            .replace(/\s+/g, "-") // Replace spaces with -
+            .replace(/[^\w\-]+/g, "") // Remove non-word chars
+            .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+    }
+
     // Filtering Logic
     const filteredProducts = initialProducts.filter((product) => {
-        // Search Filter
+        // Search Filter (Keep Title Search for explicit Search Query ONLY)
         if (searchQuery) {
             const query = searchQuery.toLowerCase()
             const title = product.title.toLowerCase()
             const desc = product.description?.toLowerCase() || ""
-
-            if (!title.includes(query) && !desc.includes(query)) {
-                return false
-            }
+            if (!title.includes(query) && !desc.includes(query)) return false
         }
-        // Fabric Filter (Title-based heuristic since no explicit field)
+
+        // Fabric Filter (Legacy Param support, treat as category for strictness if needed, or keep heuristic)
+        // User requested STRICT filtering. Let's map fabric param to smart check too if possible.
+        // But fabric serves as a "Material" filter. For now, let's keep it simple or merge logic.
+        // Actually, user said: "The filter must ONLY check product.category". 
+        // So let's try to match fabric against category too.
         if (selectedFabric) {
-            const fabric = selectedFabric.toLowerCase()
-            const title = product.title.toLowerCase()
+            const paramSlug = slugify(selectedFabric)
+            const paramRaw = selectedFabric.toLowerCase().trim()
 
-            if (fabric === 'soie') {
-                if (!title.includes('soie') && !title.includes('médine')) return false
-            } else if (fabric === 'crepe') {
-                if (!title.includes('crêpe') && !title.includes('crepe')) return false
-            } else if (fabric === 'lycra-degrade') {
-                if (!title.includes('dégradé') && !title.includes('degrade')) return false
-            } else if (!title.includes(fabric)) {
-                return false
+            // Allow heuristic for title ONLY for Fabrics if strictly necessary, but user said NO title search.
+            // However, "Soie de Médine" might be in title but category is "Hijab". 
+            // If category is "Soie de Médine" (as per Admin Dropdown), then strict check works.
+            // Let's checks category and customSlug.
+            const catSlug = slugify(product.originalCategory || "")
+            const customSlug = product.customCategorySlug ? slugify(product.customCategorySlug) : ""
+            const titleSlug = slugify(product.title)
+
+            // Exception: Fabrics are often not the main category (which might be Hijab).
+            // But usually they are chosen via Dropdown "Soie de Médine".
+            // So checking category should be enough.
+            if (catSlug !== paramSlug && customSlug !== paramSlug) {
+                // Fallback for partial matches (e.g. param "soie" matches cat "soie-de-medine")
+                if (!catSlug.includes(paramRaw) && !customSlug.includes(paramRaw)) return false
             }
         }
 
-        // Category Filter
+        // Category Filter (STRICT & SMART)
         if (selectedCategory) {
-            const cat = selectedCategory.toLowerCase()
-            const title = product.title.toLowerCase()
+            const paramSlug = slugify(selectedCategory)
 
-            if (cat === 'pack') {
-                if (product.type !== 'pack') return false
-            } else if (cat === 'hijab') {
-                if (product.type === 'pack' || (!title.includes('hijab'))) return false
-            } else if (cat === 'khimar') {
-                if (!title.includes('khimar')) return false
-            } else if (cat === 'accessoire') {
-                if (!title.includes('bonnet') && !title.includes('accessoire') && !title.includes('épingle')) return false
-            } else if (cat === 'abaya') {
-                if (!title.includes('abaya')) return false
-            }
+            const catSlug = slugify(product.originalCategory || "")
+            const customSlug = product.customCategorySlug ? slugify(product.customCategorySlug) : ""
+
+            // STRICT MATCH: Param Slug object MUST equal Category Slug OR Custom Slug
+            // OR Param Slug must be contained if it's a partial search (e.g. "pack" matching "packs-exclusifs")
+
+            // 1. Try Exact Slug Match
+            const exactMatch = (catSlug === paramSlug) || (customSlug === paramSlug)
+
+            // 2. Try Partial Match (for plural robustness like 'pack' vs 'packs')
+            // Only if "Strict" doesn't mean "Exact". "Strict" usually means "Don't look in Title".
+            const partialMatch = catSlug.includes(paramSlug) || customSlug.includes(paramSlug) || paramSlug.includes(catSlug)
+
+            if (!exactMatch && !partialMatch) return false
         }
 
         return true
@@ -146,6 +169,11 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
                     {filteredProducts.length === 0 ? (
                         <div className="text-center py-20 text-muted-foreground flex-1">
                             <p className="text-lg">Aucun résultat trouvé {searchQuery ? `pour "${searchQuery}"` : ""}.</p>
+                            {selectedCategory && (
+                                <p className="text-xs text-red-400 mt-2 font-mono">
+                                    [DEBUG] Searching for category: "{selectedCategory}" (Normalized: "{selectedCategory.toLowerCase().trim()}")
+                                </p>
+                            )}
                             <Button variant="link" onClick={() => window.location.href = '/products'} className="mt-2">
                                 Voir tous les produits
                             </Button>

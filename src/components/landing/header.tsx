@@ -87,16 +87,16 @@ export function Header() {
                                         <div className="font-bold text-primary">Boutique</div>
                                         <div className="pl-4 flex flex-col gap-3 text-base text-muted-foreground border-l-2 border-gray-100">
                                             <SheetClose asChild>
-                                                <Link href="/products" className="block hover:text-black">Tout voir</Link>
+                                                <Link href="/products" className="block hover:text-black">Tout les produits</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?fabric=soie" className="block hover:text-black">Soie de Médine</Link>
+                                                <Link href="/products?category=soie-de-medine" className="block hover:text-black">Soie de Médine</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?fabric=jersey" className="block hover:text-black">Jersey Luxe</Link>
+                                                <Link href="/products?category=jersey-luxe" className="block hover:text-black">Jersey Luxe</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?category=pack" className="block hover:text-black">Coffrets Cadeaux</Link>
+                                                <Link href="/products?category=packs" className="block hover:text-black">Coffrets Cadeaux</Link>
                                             </SheetClose>
                                         </div>
                                     </div>
@@ -169,19 +169,20 @@ export function Header() {
                             <div className="flex-1">
                                 <h4 className="font-serif font-bold text-lg mb-4 text-primary">Par Tissu</h4>
                                 <ul className="space-y-3 text-muted-foreground">
-                                    <li><Link href="/products?fabric=soie" className="hover:text-primary transition-colors block p-1">Soie de Médine</Link></li>
-                                    <li><Link href="/products?fabric=jersey" className="hover:text-primary transition-colors block p-1">Jersey</Link></li>
-                                    <li><Link href="/products?fabric=crepe" className="hover:text-primary transition-colors block p-1">Crêpe</Link></li>
-                                    <li><Link href="/products?fabric=mousseline" className="hover:text-primary transition-colors block p-1">Mousseline</Link></li>
+                                    <li><Link href="/products?category=soie-de-medine" className="hover:text-primary transition-colors block p-1">Soie de Médine</Link></li>
+                                    <li><Link href="/products?category=jersey-luxe" className="hover:text-primary transition-colors block p-1">Jersey</Link></li>
+                                    <li><Link href="/products?category=crepe-premium" className="hover:text-primary transition-colors block p-1">Crêpe</Link></li>
+                                    <li><Link href="/products?category=mousseline" className="hover:text-primary transition-colors block p-1">Mousseline</Link></li>
                                 </ul>
                             </div>
                             <div className="flex-1">
                                 <h4 className="font-serif font-bold text-lg mb-4 text-primary">Par Style</h4>
                                 <ul className="space-y-3 text-muted-foreground">
+                                    <li><Link href="/products" className="font-bold hover:text-primary transition-colors block p-1">Tout les produits</Link></li>
                                     <li><Link href="/products?category=hijab" className="hover:text-primary transition-colors block p-1">Hijabs</Link></li>
                                     <li><Link href="/products?category=khimar" className="hover:text-primary transition-colors block p-1">Khimars</Link></li>
-                                    <li><Link href="/products?category=pack" className="hover:text-primary transition-colors block p-1">Packs Cadeaux</Link></li>
-                                    <li><Link href="/products?category=accessoire" className="hover:text-primary transition-colors block p-1">Accessoires</Link></li>
+                                    <li><Link href="/products?category=packs" className="hover:text-primary transition-colors block p-1">Packs Cadeaux</Link></li>
+                                    <li><Link href="/products?category=accessoires" className="hover:text-primary transition-colors block p-1">Accessoires</Link></li>
                                 </ul>
                             </div>
                             <div className="flex-1 bg-muted/30 rounded-lg p-4 flex flex-col items-center justify-center text-center group/featured cursor-pointer" onClick={() => router.push('/products?sort=newest')}>

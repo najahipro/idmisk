@@ -19,4 +19,5 @@ export interface Product {
     showSalesCount?: boolean;
     isFreeShipping?: boolean;
     rating?: number; // 0-5
+    customCategorySlug?: string;
 }

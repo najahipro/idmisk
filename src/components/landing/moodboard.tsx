@@ -25,8 +25,12 @@ export async function Moodboard() {
         return placeholders.find(p => p.order === order)!
     })
 
-    // Helper to generate link based on categoryKey
-    const getLink = (key: string) => {
+    // Helper to generate link based on categoryKey or customUrl
+    const getLink = (item: any) => {
+        if (item.customUrl && item.customUrl.trim() !== "") {
+            return item.customUrl
+        }
+        const key = item.categoryKey
         if (key === "newest") return "/products?sort=newest"
         if (key === "all") return "/products"
         return `/products?category=${encodeURIComponent(key)}`
@@ -55,7 +59,7 @@ export async function Moodboard() {
                 {items.map((item, index) => (
                     <Link
                         key={item.id || index}
-                        href={getLink(item.categoryKey)}
+                        href={getLink(item)}
                         className={cn(
                             "group relative overflow-hidden bg-muted block",
                             // Mobile: Aspect Video (Full Width Landscape)
