@@ -89,10 +89,10 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
     const activeFiltersCount = (selectedFabric ? 1 : 0) + (selectedCategory ? 1 : 0)
 
     return (
-        <div className="w-full px-4 md:px-12">
+        <div className="w-full md:px-12">
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row items-baseline justify-between mb-8 border-b pb-6">
+            {/* Header - Keep readable padding on mobile */}
+            <div className="flex flex-col md:flex-row items-baseline justify-between mb-8 border-b pb-6 px-4 md:px-0">
                 <div>
                     <div className="flex items-center gap-2 mb-2 text-muted-foreground hover:text-primary transition-colors">
                         <Link href="/" className="flex items-center text-sm">
@@ -149,7 +149,10 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
                             </Button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-10">
+                        /* Update grid: Mobile 2 (Edge-to-Edge), Tablet 3, Desktop 4.
+                           Negative margins (-mx-4) to pull grid edge-to-edge on mobile.
+                           Width 100% + 2rem to compensate for negative margins. */
+                        <div className="-mx-4 w-[calc(100%+2rem)] md:w-full md:mx-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 gap-y-6 md:gap-x-6 md:gap-y-10 px-0 md:px-0">
                             {filteredProducts.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}

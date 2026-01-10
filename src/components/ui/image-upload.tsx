@@ -11,6 +11,7 @@ interface ImageUploadProps {
     disabled?: boolean
     onChange: (value: string[]) => void
     onRemove: (value: string) => void
+    onAdd?: (value: string) => void
     value: string[]
 }
 
@@ -18,6 +19,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     disabled,
     onChange,
     onRemove,
+    onAdd,
     value
 }) => {
     const [isMounted, setIsMounted] = useState(false)
@@ -38,7 +40,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             return;
         }
         console.log("Upload Success URL:", result.info.secure_url)
-        onChange([...value, result.info.secure_url])
+
+        if (onAdd) {
+            onAdd(result.info.secure_url)
+        } else {
+            onChange([...value, result.info.secure_url])
+        }
     };
 
     const onError = (error: any) => {
@@ -58,22 +65,37 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 onLoad={() => console.log("Cloudinary Script Loaded via next/script")}
                 onError={(e) => console.error("Cloudinary Script Failed to Load", e)}
             />
-            <div className="mb-4 flex items-center gap-4">
-                {value.map((url) => (
-                    <div key={url} className="relative w-[200px] h-[200px] rounded-md overflow-hidden">
-                        <div className="z-10 absolute top-2 right-2">
-                            <Button type="button" onClick={() => onRemove(url)} variant="destructive" size="icon">
-                                <Trash className="h-4 w-4" />
-                            </Button>
+            <div className="mb-4 flex items-center gap-4 flex-wrap">
+                {value.map((url) => {
+                    const isVideo = url.match(/\.(mp4|webm|mov)$/i) || url.includes("video") || url.includes("fl_attachment");
+                    return (
+                        <div key={url} className="relative w-[200px] h-[200px] rounded-md overflow-hidden bg-gray-100 border">
+                            <div className="z-10 absolute top-2 right-2">
+                                <Button type="button" onClick={() => onRemove(url)} variant="destructive" size="icon">
+                                    <Trash className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            {isVideo ? (
+                                <video
+                                    src={url}
+                                    className="w-full h-full object-cover"
+                                    controls={false}
+                                // muted 
+                                // autoPlay
+                                // loop
+                                // Previews usually static or simple
+                                />
+                            ) : (
+                                <Image
+                                    fill
+                                    className="object-cover"
+                                    alt="Image"
+                                    src={url}
+                                />
+                            )}
                         </div>
-                        <Image
-                            fill
-                            className="object-cover"
-                            alt="Image"
-                            src={url}
-                        />
-                    </div>
-                ))}
+                    )
+                })}
             </div>
             <CldUploadWidget
                 uploadPreset="idmisk_preset"

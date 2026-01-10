@@ -221,15 +221,13 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                         value={field.value.map((image) => image)}
                                                         disabled={isSubmitting}
                                                         onChange={(newUrl) => {
-                                                            // ImageUpload returns string[] now or we verify its output
-                                                            // Based on our ImageUpload component, it returns string[]
-                                                            // But if the component sends specific URL, we might need adapter
-                                                            // Let's assume ImageUpload accepts value={string[]} and calls onChange={string[]}
-
-                                                            // Wait, standard Cloudinary widget usually returns one by one? 
-                                                            // The existing ImageUpload component (which we viewed) has onChange(value: string[])
-                                                            // So it is already perfectly compatible with arrays.
                                                             field.onChange(newUrl)
+                                                        }}
+                                                        onAdd={(url) => {
+                                                            // Fix for multiple upload race condition:
+                                                            // Always fetch the LATEST value from the form store
+                                                            const currentImages = form.getValues("images") || [];
+                                                            field.onChange([...currentImages, url]);
                                                         }}
                                                         onRemove={(urlToRemove) => {
                                                             field.onChange(field.value.filter((current) => current !== urlToRemove))

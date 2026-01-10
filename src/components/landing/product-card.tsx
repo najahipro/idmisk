@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Star } from "lucide-react"
+import { Star, ShoppingBag } from "lucide-react"
 import { useCurrency } from "@/context/currency-context"
 import { useTranslation } from "react-i18next"
 import { Product } from "@/types/product"
@@ -65,8 +65,17 @@ export function ProductCard({ product }: ProductCardProps) {
                         </div>
                     )}
                 </div>
-                {/* Quick Buy Button on Hover - Overlay at Bottom */}
-                <div className="absolute inset-x-0 bottom-0 z-20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
+                {/* Fast Add Button - Mobile Only (Visible < md/lg) */}
+                <button
+                    onClick={handleAddToCart}
+                    className="md:hidden absolute bottom-2 right-2 z-20 bg-white text-black p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                    aria-label="Ajouter au panier"
+                >
+                    <ShoppingBag className="w-4 h-4" />
+                </button>
+
+                {/* Quick Buy Button on Hover - Overlay at Bottom - Desktop Only */}
+                <div className="hidden md:block absolute inset-x-0 bottom-0 z-20 opacity-0 group-hover/card:opacity-100 transition-opacity duration-300">
                     <Button
                         onClick={handleAddToCart}
                         className="w-full bg-white text-black hover:bg-white/90 text-[10px] uppercase tracking-widest font-medium py-3 h-auto rounded-none border-t border-black/5 shadow-none"
@@ -75,12 +84,12 @@ export function ProductCard({ product }: ProductCardProps) {
                     </Button>
                 </div>
             </div>
-            <div className="bg-background pt-2">
-                <div className="flex justify-between items-start">
-                    <div className="space-y-1 w-full">
-                        <div className="flex flex-col gap-1">
+            <div className="bg-background pt-2 text-center">
+                <div className="flex flex-col items-center">
+                    <div className="space-y-1 w-full flex flex-col items-center">
+                        <div className="flex flex-col gap-1 items-center">
                             {(product.rating || 0) > 0 && (
-                                <div className="flex gap-0.5">
+                                <div className="flex gap-0.5 mb-1">
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
@@ -89,11 +98,11 @@ export function ProductCard({ product }: ProductCardProps) {
                                     ))}
                                 </div>
                             )}
-                            <h3 className="text-[11px] font-medium uppercase tracking-widest text-black group-hover/card:text-black/70 transition-colors leading-tight">
+                            <h3 className="text-sm font-medium text-black group-hover/card:text-black/70 transition-colors leading-tight line-clamp-2">
                                 {product.title}
                             </h3>
                         </div>
-                        <p className="text-[11px] font-medium tracking-wide text-black/80">{formatPrice(product.priceNum)}</p>
+                        <p className="text-sm font-medium text-black/80">{formatPrice(product.priceNum)}</p>
                     </div>
                 </div>
             </div>

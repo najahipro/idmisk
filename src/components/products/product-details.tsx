@@ -15,7 +15,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
-import { cn } from "@/lib/utils"
+import { cn, getMainImage } from "@/lib/utils"
 // Import Hooks
 import { useCart } from "@/context/cart-context"
 import { useCurrency } from "@/context/currency-context"
@@ -161,44 +161,44 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                     <p className="text-muted-foreground leading-relaxed text-base md:text-lg border-b pb-6 mb-6">
                         {product.description || "Description à venir."}
                     </p>
-                </div>
 
-                {/* Quantity Selector */}
-                <div className="mb-8">
-                    <span className="text-sm font-medium text-foreground mb-3 block">Quantité</span>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center border rounded-full">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 rounded-l-full hover:bg-transparent"
-                                onClick={decrementQuantity}
-                                disabled={quantity <= 1}
-                            >
-                                <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-8 text-center font-medium">{quantity}</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-10 w-10 rounded-r-full hover:bg-transparent"
-                                onClick={incrementQuantity}
-                            >
-                                <Plus className="h-4 w-4" />
-                            </Button>
+                    {/* Quantity Selector */}
+                    <div className="mb-4">
+                        <span className="text-sm font-medium text-foreground mb-3 block">Quantité</span>
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center border rounded-full">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-10 w-10 rounded-l-full hover:bg-transparent"
+                                    onClick={decrementQuantity}
+                                    disabled={quantity <= 1}
+                                >
+                                    <Minus className="h-4 w-4" />
+                                </Button>
+                                <span className="w-8 text-center font-medium">{quantity}</span>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-10 w-10 rounded-r-full hover:bg-transparent"
+                                    onClick={incrementQuantity}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Actions */}
-                <div className="sticky bottom-0 left-0 right-0 p-4 md:static md:p-0 bg-background md:bg-transparent border-t md:border-t-0 z-20 space-y-3">
-                    <Button
-                        onClick={handleAddToCart}
-                        size="lg"
-                        className="w-full text-lg h-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-white transition-transform active:scale-[0.98]"
-                    >
-                        Ajouter au Panier - {formatPrice(product.price)}
-                    </Button>
+                    {/* Actions */}
+                    <div className="sticky bottom-0 left-0 right-0 p-4 md:static md:p-0 bg-background md:bg-transparent border-t md:border-t-0 z-20 space-y-3">
+                        <Button
+                            onClick={handleAddToCart}
+                            size="lg"
+                            className="w-full text-lg h-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-white transition-transform active:scale-[0.98]"
+                        >
+                            Ajouter au Panier - {formatPrice(product.price)}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -211,7 +211,7 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                             <Link href={`/products/${item.id}`} className="block">
                                 <div className="relative aspect-square bg-muted/20 rounded-sm overflow-hidden mb-3">
                                     <Image
-                                        src={(item.images && item.images.length > 0) ? item.images[0] : "/placeholder.jpg"}
+                                        src={getMainImage(item.images) || "/placeholder.jpg"}
                                         alt={item.name}
                                         fill
                                         className="object-cover group-hover:scale-105 transition-transform duration-500"
