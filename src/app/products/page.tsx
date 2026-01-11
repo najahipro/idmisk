@@ -24,7 +24,7 @@ export default async function ProductsPage() {
         showSalesCount: false,
         rating: 0,
         colors: [],
-        colors: [],
+
         description: p.description,
         originalCategory: p.category,
         customCategorySlug: p.customCategorySlug

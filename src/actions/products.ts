@@ -124,12 +124,11 @@ export async function updateProduct(productId: string, formData: FormData) {
                 stock,
                 status,
                 description,
-                images: images.join(','), // CSV for SQLite/Legacy Util compatibility
+                images: images.join(','),
                 category,
                 isFeatured,
                 showOnHome,
                 isNewArrival,
-                isFreeShipping,
                 isFreeShipping,
                 colors,
                 customCategorySlug: formData.get("customCategorySlug") as string,

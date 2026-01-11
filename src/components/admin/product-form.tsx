@@ -53,8 +53,6 @@ const formSchema = z.object({
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
-    isFreeShipping: z.boolean().default(false),
-    isFreeShipping: z.boolean().default(false),
     colors: z.string().optional(), // Comma separated
     customCategorySlug: z.string().optional(),
 })

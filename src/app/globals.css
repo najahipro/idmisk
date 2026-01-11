@@ -30,12 +30,3 @@
 iframe[src*="cloudinary"] {
   z-index: 5001 !important;
 }
-
-/* Fix Cloudinary Widget Z-Index above Shadcn Dialogs */
-.cloudinary-overlay {
-  z-index: 5000 !important;
-}
-
-iframe[src*="cloudinary"] {
-  z-index: 5001 !important;
-}
