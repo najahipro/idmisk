@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, Lock } from "lucide-react"
+import { ArrowRight, Lock, Image as ImageIcon } from "lucide-react"
 // import { useTranslation } from "react-i18next" // Keeping translation if needed, but simplifying for now
 import { cn } from "@/lib/utils"
 // import { getUniversList } from "@/actions/univers" // We need to fetch data. Since this is a client component, we should fetch via useEffect or make it server component.
@@ -63,12 +63,18 @@ export function UniversSection() {
                         {!item.isLocked ? (
                             <Link href={item.link || "#"} className="block w-full h-full">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors z-10" />
-                                <Image
-                                    src={item.image || "/placeholder.jpg"}
-                                    alt={item.title}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
+                                {item.image ? (
+                                    <Image
+                                        src={item.image}
+                                        alt={item.title}
+                                        fill
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <ImageIcon className="w-10 h-10 text-gray-400 opacity-50" />
+                                    </div>
+                                )}
 
                                 <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
                                     <h3 className="text-white text-lg md:text-xl font-serif font-bold mb-2 drop-shadow-md">

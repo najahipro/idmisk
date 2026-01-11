@@ -21,7 +21,7 @@ export async function getUniversList() {
         if (list.length === 0) {
             // Seed initial data matching hardcoded
             const seedData = [
-                { title: "Hijabs Premium", image: "/id.jpg", link: "/products", isLocked: false, order: 1 },
+                { title: "Hijabs Premium", image: "/idmisk.jpg", link: "/products", isLocked: false, order: 1 },
                 { title: "Abayas & Kimonos", image: "", link: "#", isLocked: true, order: 2 },
                 { title: "Maman & Bébé", image: "", link: "#", isLocked: true, order: 3 },
                 { title: "Tenues de Nuit", image: "", link: "#", isLocked: true, order: 4 },

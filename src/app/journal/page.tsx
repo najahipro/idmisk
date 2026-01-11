@@ -47,7 +47,9 @@ export default async function JournalPage() {
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">No Image</div>
+                                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                                    <span className="text-xs uppercase tracking-widest">No Image</span>
+                                                </div>
                                             )}
                                         </div>
                                     </Link>

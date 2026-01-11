@@ -64,7 +64,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
                 {/* Featured Image */}
                 <div className="relative w-full aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-lg mb-12">
-                    {article.image && (
+                    {article.image ? (
                         <Image
                             src={article.image}
                             alt={article.title}
@@ -72,6 +72,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                             className="object-cover"
                             priority
                         />
+                    ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center text-muted-foreground">
+                            <span className="italic">IDMISK Journal</span>
+                        </div>
                     )}
                 </div>
 

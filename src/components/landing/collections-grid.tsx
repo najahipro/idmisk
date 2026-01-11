@@ -11,7 +11,7 @@ export function CollectionsGrid() {
             id: "hijabs",
             title: "Hijabs Premium",
             href: "/products",
-            image: "/id.jpg", // Using existing placeholder
+            image: "/idmisk.jpg", // Using existing placeholder
             description: "Découvrez notre collection de hijabs premium en soie de Médine et crêpe."
         },
         {
