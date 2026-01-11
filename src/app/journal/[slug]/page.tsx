@@ -1,85 +1,96 @@
-import Link from "next/link"
-import Image from "next/image"
+import { getArticle, getArticles } from "@/actions/articles"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Calendar, User, Share2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { BLOG_POSTS } from "@/lib/blog-data"
+import Image from "next/image"
+import Link from "next/link"
+import { Calendar, User, ArrowLeft } from "lucide-react"
+import { UniversSection } from "@/components/landing/univers-section"
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-    const slug = (await params).slug
-    const post = BLOG_POSTS.find((p) => p.slug === slug)
-    if (!post) return { title: "Article introuvable" }
+export const dynamic = "force-dynamic"
+
+interface ArticlePageProps {
+    params: Promise<{
+        slug: string
+    }>
+}
+
+export async function generateMetadata({ params }: ArticlePageProps) {
+    const { slug } = await params
+    const { article } = await getArticle(slug)
+    if (!article) return { title: "Article introuvable" }
 
     return {
-        title: `${post.title} | IDMISK Journal`,
-        description: post.excerpt,
+        title: `${article.title} | IDMISK Journal`,
+        description: article.excerpt,
     }
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-    const slug = (await params).slug
-    const post = BLOG_POSTS.find((p) => p.slug === slug)
+export default async function ArticlePage({ params }: ArticlePageProps) {
+    const { slug } = await params
+    const { article } = await getArticle(slug)
 
-    if (!post) {
+    if (!article) {
         notFound()
     }
 
     return (
-        <article className="min-h-screen bg-background pb-20">
-            {/* Hero Image */}
-            <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden">
-                <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    priority
-                />
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                    <div className="max-w-3xl space-y-4">
-                        <div className="flex items-center justify-center gap-4 text-sm text-white/90 font-medium">
-                            <span className="flex items-center gap-1 bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
-                                <Calendar className="w-4 h-4" /> {post.date}
-                            </span>
-                            <span className="flex items-center gap-1 bg-black/30 px-3 py-1 rounded-full backdrop-blur-sm">
-                                <User className="w-4 h-4" /> {post.author}
-                            </span>
-                        </div>
-                        <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-tight drop-shadow-lg">
-                            {post.title}
-                        </h1>
+        <div className="min-h-screen bg-background">
+            <div className="container mx-auto px-4 py-12 md:py-20 max-w-4xl">
+                {/* Back Link */}
+                <Link href="/journal" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Retour au Journal
+                </Link>
+
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground mb-4">
+                        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            {article.category || "Conseils"}
+                        </span>
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(article.date).toLocaleDateString()}</span>
+                    </div>
+
+                    <h1 className="text-3xl md:text-5xl font-serif font-bold text-foreground mb-6 leading-tight">
+                        {article.title}
+                    </h1>
+
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="flex items-center gap-2 font-medium">
+                            <User className="w-4 h-4 text-muted-foreground" />
+                            {article.author}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Featured Image */}
+                <div className="relative w-full aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-lg mb-12">
+                    {article.image && (
+                        <Image
+                            src={article.image}
+                            alt={article.title}
+                            fill
+                            className="object-cover"
+                            priority
+                        />
+                    )}
+                </div>
+
+                {/* Content */}
+                <div className="prose prose-lg prose-slate mx-auto max-w-none">
+                    {/* Render plain text or simple markdown. 
+                        Ideally we'd use a markdown renderer if content is complex. 
+                        For now assuming paragraph breaks logic or raw text.
+                    */}
+                    <div className="whitespace-pre-wrap font-serif text-gray-700 leading-relaxed">
+                        {article.content}
                     </div>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 md:px-6 max-w-4xl -mt-10 relative z-10">
-                <div className="bg-white rounded-xl shadow-xl p-8 md:p-12 border border-gray-100">
-
-                    {/* Content using dangerouslySetInnerHTML because our data is HTML string */}
-                    <div
-                        className="prose prose-lg prose-headings:font-serif prose-headings:text-primary prose-a:text-primary prose-a:font-semibold hover:prose-a:underline prose-img:rounded-xl text-gray-600 leading-relaxed max-w-none"
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                    />
-
-                    {/* Footer Actions */}
-                    <div className="mt-12 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-6">
-                        <Link href="/journal">
-                            <Button variant="outline" className="gap-2">
-                                <ArrowLeft className="w-4 h-4" /> Retour au Journal
-                            </Button>
-                        </Link>
-
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm text-muted-foreground font-medium">Partager :</span>
-                            <Button variant="ghost" size="icon" className="rounded-full">
-                                <Share2 className="w-4 h-4" />
-                            </Button>
-                        </div>
-                    </div>
-
-                </div>
+            {/* Footer / Related */}
+            <div className="bg-gray-50 border-t border-gray-100 mt-20">
+                <UniversSection />
             </div>
-        </article>
+        </div>
     )
 }

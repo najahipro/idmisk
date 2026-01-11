@@ -13,6 +13,7 @@ import { Header } from "@/components/landing/header";
 import { TopBar } from "@/components/landing/top-bar";
 import { Footer } from "@/components/landing/footer";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 // const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -50,6 +51,7 @@ export default function RootLayout({
                                     </div>
                                     <CartSheet />
                                     <WhatsAppButton />
+                                    <Toaster />
                                 </OrderProvider>
                             </CartProvider>
                         </SessionProvider>

@@ -4,6 +4,8 @@ import { LayoutDashboard, Package, Image as ImageIcon, ShoppingCart, Settings, L
 const sidebarLinks = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/products", label: "Produits", icon: Package },
+    { href: "/admin/univers", label: "Univers (Accueil)", icon: LayoutTemplate },
+    { href: "/admin/journal", label: "Journal (Blog)", icon: LayoutDashboard },
     { href: "/admin/collections-home", label: "Collections Home", icon: LayoutTemplate },
     { href: "/admin/orders", label: "Commandes", icon: ShoppingCart },
     // { href: "/admin/settings", label: "Réglages", icon: Settings },

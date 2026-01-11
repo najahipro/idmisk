@@ -4,11 +4,15 @@
 
 @layer base {
   :root {
-    --background: #fdfbf7; /* Very Light Cream */
-    --foreground: #333333; /* Dark Charcoal */
-    
-    --primary: #7da2a9;    /* Dusty Blue */
-    --secondary: #aebfa3;  /* Soft Sage */
+    --background: #fdfbf7;
+    /* Very Light Cream */
+    --foreground: #333333;
+    /* Dark Charcoal */
+
+    --primary: #7da2a9;
+    /* Dusty Blue */
+    --secondary: #aebfa3;
+    /* Soft Sage */
   }
 }
 
@@ -16,4 +20,22 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Fix Cloudinary Widget Z-Index above Shadcn Dialogs */
+.cloudinary-overlay {
+  z-index: 5000 !important;
+}
+
+iframe[src*="cloudinary"] {
+  z-index: 5001 !important;
+}
+
+/* Fix Cloudinary Widget Z-Index above Shadcn Dialogs */
+.cloudinary-overlay {
+  z-index: 5000 !important;
+}
+
+iframe[src*="cloudinary"] {
+  z-index: 5001 !important;
 }

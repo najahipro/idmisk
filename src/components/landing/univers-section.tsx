@@ -3,46 +3,41 @@
 import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight, Lock } from "lucide-react"
-import { useTranslation } from "react-i18next"
+// import { useTranslation } from "react-i18next" // Keeping translation if needed, but simplifying for now
 import { cn } from "@/lib/utils"
+// import { getUniversList } from "@/actions/univers" // We need to fetch data. Since this is a client component, we should fetch via useEffect or make it server component.
+// Best approach: Make it Async Server Component if possible, but it's used in Home Page. 
+// Let's keep it clean: We will inline the fetch here if it was a Server Component, but page.tsx imports it.
+// The file is currently "use client". Let's try to keep it client for animations or switch to Server Component.
+// The existing file has "use client". Let's check parent page. 
+// Actually, simple solution: Use an inner async component or just fetch in client effect for now to match current architecture quickly.
+// However, Actions are callable from Client Components.
+
+import { useEffect, useState } from "react"
+import { getUniversList } from "@/actions/univers"
+
+interface UniversItem {
+    id: string
+    title: string
+    image: string
+    link: string | null
+    isLocked: boolean
+    order: number
+}
 
 export function UniversSection() {
-    const { t } = useTranslation()
+    // const { t } = useTranslation() 
+    const [items, setItems] = useState<UniversItem[]>([])
 
-    const collections = [
-        {
-            id: "hijabs",
-            title: "Hijabs Premium",
-            status: "active",
-            href: "/products",
-            image: "/id.jpg", // Using existing placeholder for now
-            cta: "Découvrir"
-        },
-        {
-            id: "abayas",
-            title: "Abayas & Kimonos",
-            status: "locked",
-            href: "#",
-            color: "bg-[#E6E2D8]", // Soft Beige
-            cta: "Bientôt Disponible"
-        },
-        {
-            id: "maman-bebe",
-            title: "Maman & Bébé",
-            status: "locked",
-            href: "#",
-            color: "bg-[#D8E2DC]", // Soft Sage
-            cta: "Bientôt Disponible"
-        },
-        {
-            id: "nuit",
-            title: "Tenues de Nuit",
-            status: "locked",
-            href: "#",
-            color: "bg-[#F2E8E8]", // Soft Rose
-            cta: "Bientôt Disponible"
-        }
-    ]
+    useEffect(() => {
+        getUniversList().then(res => {
+            if (res.list) setItems(res.list)
+        })
+    }, [])
+
+    // If empty (loading), maybe show skeleton or nothing? Or keeping initial static as fallback?
+    // Let's show nothing until loaded or skeleton.
+    if (items.length === 0) return null
 
     return (
         <section className="container mx-auto px-4 md:px-6 py-16 md:py-24">
@@ -57,16 +52,16 @@ export function UniversSection() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {collections.map((item) => (
+                {items.map((item) => (
                     <div
                         key={item.id}
                         className={cn(
                             "group relative aspect-[3/4] overflow-hidden rounded-lg border border-border/50",
-                            item.status === "active" ? "cursor-pointer" : "cursor-default"
+                            !item.isLocked ? "cursor-pointer" : "cursor-default"
                         )}
                     >
-                        {item.status === "active" ? (
-                            <Link href={item.href} className="block w-full h-full">
+                        {!item.isLocked ? (
+                            <Link href={item.link || "#"} className="block w-full h-full">
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors z-10" />
                                 <Image
                                     src={item.image || "/placeholder.jpg"}
@@ -80,23 +75,34 @@ export function UniversSection() {
                                         {item.title}
                                     </h3>
                                     <div className="flex items-center gap-2 text-white text-sm font-medium tracking-wide uppercase opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                                        {item.cta} <ArrowRight className="w-4 h-4" />
+                                        Découvrir <ArrowRight className="w-4 h-4" />
                                     </div>
                                 </div>
                             </Link>
                         ) : (
-                            <div className={cn("w-full h-full flex flex-col items-center justify-center p-6 text-center transition-opacity hover:opacity-90", item.color)}>
-                                <div className="absolute top-4 right-4 text-muted-foreground/40">
+                            /* Locked State - Using a soft BG color or Image with blur/overlay */
+                            <div className={cn("w-full h-full flex flex-col items-center justify-center p-6 text-center transition-opacity hover:opacity-90 bg-gray-100")}>
+                                {item.image && (
+                                    <Image
+                                        src={item.image}
+                                        alt={item.title}
+                                        fill
+                                        className="object-cover opacity-50 grayscale"
+                                    />
+                                )}
+                                <div className="absolute top-4 right-4 text-muted-foreground/60 z-30">
                                     <Lock className="w-5 h-5" />
                                 </div>
 
-                                <h3 className="text-foreground/80 text-lg md:text-xl font-serif font-bold mb-3 z-10">
-                                    {item.title}
-                                </h3>
+                                <div className="z-10 relative">
+                                    <h3 className="text-foreground/80 text-lg md:text-xl font-serif font-bold mb-3">
+                                        {item.title}
+                                    </h3>
 
-                                <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/50 text-muted-foreground text-[10px] uppercase font-bold tracking-wider backdrop-blur-sm border border-white/20">
-                                    {t('common.comingSoon', 'Bientôt Disponible')}
-                                </span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/50 text-muted-foreground text-[10px] uppercase font-bold tracking-wider backdrop-blur-sm border border-white/20">
+                                        Bientôt Disponible
+                                    </span>
+                                </div>
                             </div>
                         )}
                     </div>

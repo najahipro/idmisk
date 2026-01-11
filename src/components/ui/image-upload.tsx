@@ -39,12 +39,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             console.log("Upload event was not success:", result.event)
             return;
         }
-        console.log("Upload Success URL:", result.info.secure_url)
+
+        // Robust check for URL
+        // @ts-ignore
+        const url = result?.info?.secure_url;
+
+        console.log("Upload Success URL extracted:", url)
+
+        if (!url) {
+            console.error("CRITICAL: No secure_url found in result info")
+            return
+        }
 
         if (onAdd) {
-            onAdd(result.info.secure_url)
+            console.log("Calling onAdd with URL:", url)
+            onAdd(url)
         } else {
-            onChange([...value, result.info.secure_url])
+            console.log("Calling onChange with new array:", [...value, url])
+            onChange([...value, url])
         }
     };
 
