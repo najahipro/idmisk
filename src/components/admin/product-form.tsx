@@ -82,6 +82,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
     const title = isEdit ? "Modifier le produit" : "Ajouter un produit"
     const action = isEdit ? "Enregistrer les modifications" : "Créer le produit"
 
+    // Safety check: Ensure category is valid, fallback for legacy data
+    const isValidCategory = (cat: string) => MAIN_CATEGORIES.includes(cat)
+
     const defaultValues = initialData ? {
         ...initialData,
         price: parseFloat(String(initialData.price)),
@@ -89,6 +92,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
         images: initialData.images || [],
         customCategorySlug: initialData.customCategorySlug || "",
         collectionName: initialData.collectionName || "",
+        // SAFETY: If legacy category (e.g., "Soie de Médine"), default to "Hijabs"
+        category: isValidCategory(initialData.category) ? initialData.category : "Hijabs",
     } : {
         name: "",
         description: "",

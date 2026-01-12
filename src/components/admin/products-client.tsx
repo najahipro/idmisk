@@ -94,6 +94,24 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
         {
             accessorKey: "category",
             header: "Catégorie",
+            cell: ({ row }) => {
+                const category = row.original.category
+                const validCategories = ["Hijabs", "Khimars", "Packs", "Accessoires"]
+                const isLegacy = !validCategories.includes(category)
+
+                return (
+                    <div className="flex items-center gap-2">
+                        <span className={isLegacy ? "text-orange-600 font-medium" : ""}>
+                            {category}
+                        </span>
+                        {isLegacy && (
+                            <span className="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded uppercase font-bold">
+                                Legacy
+                            </span>
+                        )}
+                    </div>
+                )
+            }
         },
         {
             accessorKey: "price",
