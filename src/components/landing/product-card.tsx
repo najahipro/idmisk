@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,11 @@ export function ProductCard({ product }: ProductCardProps) {
     const { addItem } = useCart()
     const { formatPrice } = useCurrency()
 
+    // State for image swap on hover
+    const [displayedImage, setDisplayedImage] = useState(product.image)
 
+    // Debug: Check images array
+    console.log('Product:', product.title, 'Images:', product.images)
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault() // Prevent navigation
@@ -49,16 +53,28 @@ export function ProductCard({ product }: ProductCardProps) {
                         Pack
                     </span>
                 )}
-                <div className="relative w-full h-full bg-gray-100 flex items-center justify-center">
-                    {product.image ? (
+                <div
+                    className="relative w-full h-full bg-gray-100 overflow-hidden"
+                    onMouseEnter={() => {
+                        // Swap to second image on hover if it exists
+                        if (product.images && product.images.length > 1 && product.images[1]) {
+                            setDisplayedImage(product.images[1])
+                        }
+                    }}
+                    onMouseLeave={() => {
+                        // Reset to first image
+                        setDisplayedImage(product.image)
+                    }}
+                >
+                    {displayedImage ? (
                         <Image
-                            src={product.image}
+                            src={displayedImage}
                             alt={product.title}
                             fill
-                            className="object-cover transition-transform duration-700 group-hover/card:scale-105"
+                            className="object-cover transition-opacity duration-300"
                         />
                     ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-300">
+                        <div className="flex flex-col items-center justify-center h-full text-gray-300">
                             <div className="w-10 h-10 border-2 border-current rounded-full flex items-center justify-center mb-2">
                                 <span className="text-lg font-serif italic">id</span>
                             </div>

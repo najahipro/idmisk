@@ -11,25 +11,39 @@ export default async function ProductsPage() {
         orderBy: { createdAt: 'desc' }
     })
 
-    const mapToUiProduct = (p: any): Product => ({
-        id: p.id,
-        title: p.name,
-        price: `${p.price} DH`,
-        priceNum: p.price,
-        type: p.category === 'pack' ? 'pack' : 'single',
-        image: getMainImage(p.images),
-        isNew: p.isNewArrival,
-        affiliateEnabled: false,
-        salesCount: 0,
-        showSalesCount: false,
-        rating: 0,
-        colors: [],
+    const mapToUiProduct = (p: any): Product => {
+        // Parse images array from JSON string or comma-separated string
+        let imagesArray: string[] = []
+        if (p.images) {
+            try {
+                imagesArray = typeof p.images === 'string' ? JSON.parse(p.images) : p.images
+            } catch {
+                // Fallback for comma-separated string
+                imagesArray = p.images.split(',').map((img: string) => img.trim())
+            }
+        }
 
-        description: p.description,
-        originalCategory: p.category,
-        collectionName: p.collectionName,
-        customCategorySlug: p.customCategorySlug
-    })
+        return {
+            id: p.id,
+            title: p.name,
+            price: `${p.price} DH`,
+            priceNum: p.price,
+            type: p.category === 'pack' ? 'pack' : 'single',
+            image: getMainImage(p.images),
+            images: imagesArray, // Full array for hover swap
+            isNew: p.isNewArrival,
+            affiliateEnabled: false,
+            salesCount: 0,
+            showSalesCount: false,
+            rating: 0,
+            colors: [],
+
+            description: p.description,
+            originalCategory: p.category,
+            collectionName: p.collectionName,
+            customCategorySlug: p.customCategorySlug
+        }
+    }
 
     const initialProducts = productsData.map(mapToUiProduct)
 

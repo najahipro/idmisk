@@ -7,6 +7,7 @@ export interface Product {
     priceNum: number;
     type: ProductType;
     image: string;
+    images?: string[]; // Array of all product images for hover swap
     videoUrl?: string;
     colors?: { name: string; hex: string }[];
     isNew?: boolean;
