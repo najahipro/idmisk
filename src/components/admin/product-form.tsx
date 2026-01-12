@@ -52,8 +52,8 @@ const formSchema = z.object({
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
-    colors: z.string().optional(),
-    customCategorySlug: z.string().optional(),
+    colors: z.string().nullish(),
+    customCategorySlug: z.string().nullish(),
 })
 
 type ProductFormValues = z.infer<typeof formSchema>
@@ -113,8 +113,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
         formData.append("stock", values.stock.toString())
         formData.append("category", values.category)
 
+        // Convert null/undefined to empty string to prevent validation errors
         formData.append("collectionName", "")
-        formData.append("customCategorySlug", values.customCategorySlug || "")
+        formData.append("customCategorySlug", values.customCategorySlug ?? "")
 
         formData.append("images", JSON.stringify(values.images))
         formData.append("colors", values.colors || "")
@@ -230,22 +231,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             <FormItem>
                                                 <FormControl>
                                                     <ImageUpload
-                                                        value={field.value}
+                                                        value={field.value || []}
                                                         disabled={isSubmitting}
-                                                        // ✅ FIX 1: NE PAS AJOUTER SI DÉJÀ PRÉSENT
-                                                        onChange={(newUrl) => {
-                                                            if (newUrl && !field.value.includes(newUrl)) {
-                                                                field.onChange([...field.value, newUrl])
-                                                            }
-                                                        }}
-                                                        // ✅ FIX 2: SUPPRESSION PROPRE
+                                                        onChange={(urls) => field.onChange(urls)}
                                                         onRemove={(url) => {
-                                                            field.onChange(field.value.filter((current) => current !== url))
+                                                            field.onChange((field.value || []).filter((current) => current !== url))
                                                         }}
-                                                        // Fallback safe
                                                         onAdd={(url) => {
-                                                            if (url && !field.value.includes(url)) {
-                                                                field.onChange([...field.value, url])
+                                                            const current = field.value || []
+                                                            if (!current.includes(url)) {
+                                                                field.onChange([...current, url])
                                                             }
                                                         }}
                                                     />

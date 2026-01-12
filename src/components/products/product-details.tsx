@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { ChevronRight, Heart, Star, Truck, ShieldCheck, PlayCircle, Minus, Plus } from "lucide-react"
+import { ChevronRight, Heart, Star, Truck, PlayCircle, Minus, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ProductGallery } from "@/components/products/product-gallery"
@@ -173,26 +173,17 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
 
                         <AccordionItem value="shipping" className="border-b">
                             <AccordionTrigger className="text-base font-medium hover:no-underline py-4">
-                                Livraison & Retour
+                                Livraison
                             </AccordionTrigger>
                             <AccordionContent>
-                                <div className="space-y-3 text-muted-foreground">
-                                    <div className="flex items-start gap-2">
-                                        <Truck className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <p className="font-medium text-foreground">Livraison partout au Maroc</p>
-                                            <p className="text-sm">Délai de livraison : 2-5 jours ouvrables</p>
-                                            {product.isFreeShipping && (
-                                                <p className="text-sm text-green-600 font-medium mt-1">✓ Livraison gratuite sur ce produit</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-2">
-                                        <ShieldCheck className="h-5 w-5 mt-0.5 flex-shrink-0" />
-                                        <div>
-                                            <p className="font-medium text-foreground">Retours faciles</p>
-                                            <p className="text-sm">Retour gratuit sous 14 jours si le produit ne vous convient pas</p>
-                                        </div>
+                                <div className="flex items-start gap-2 text-muted-foreground">
+                                    <Truck className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-medium text-foreground">Livraison partout au Maroc</p>
+                                        <p className="text-sm">Délai de livraison : 24 à 48 heures</p>
+                                        {product.isFreeShipping && (
+                                            <p className="text-sm text-green-600 font-medium mt-1">✓ Livraison gratuite sur ce produit</p>
+                                        )}
                                     </div>
                                 </div>
                             </AccordionContent>

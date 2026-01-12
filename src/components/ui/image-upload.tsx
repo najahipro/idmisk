@@ -51,6 +51,12 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             return
         }
 
+        // 🚨 CRITICAL FIX: Check for duplicates BEFORE adding
+        if (value.includes(url)) {
+            console.warn("⚠️ Duplicate image detected, ignoring:", url)
+            return
+        }
+
         if (onAdd) {
             console.log("Calling onAdd with URL:", url)
             onAdd(url)
