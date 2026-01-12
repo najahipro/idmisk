@@ -27,6 +27,7 @@ export default async function ProductsPage() {
 
         description: p.description,
         originalCategory: p.category,
+        collectionName: p.collectionName,
         customCategorySlug: p.customCategorySlug
     })
 

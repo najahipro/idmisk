@@ -15,6 +15,7 @@ export interface Product {
     showOnHome?: boolean;
     isNewArrival?: boolean;
     originalCategory?: string; // For Admin display
+    collectionName?: string; // Fabric/Collection name (e.g., "Soie de Médine")
     salesCount?: number;
     showSalesCount?: boolean;
     isFreeShipping?: boolean;

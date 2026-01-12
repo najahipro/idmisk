@@ -101,6 +101,11 @@ export function ProductCard({ product }: ProductCardProps) {
                             <h3 className="text-sm font-medium text-black group-hover/card:text-black/70 transition-colors leading-tight line-clamp-2">
                                 {product.title}
                             </h3>
+                            {product.collectionName && (
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                    {product.collectionName}
+                                </p>
+                            )}
                         </div>
                         <p className="text-sm font-medium text-black/80">{formatPrice(product.priceNum)}</p>
                     </div>

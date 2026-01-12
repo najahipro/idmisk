@@ -22,6 +22,7 @@ export async function addProduct(formData: FormData) {
         const description = formData.get("description") as string || ""
         const imagesRaw = formData.get("images") as string
         const category = formData.get("category") as string
+        const collectionName = formData.get("collectionName") as string || null
         const status = formData.get("status") as string || "active"
 
         let images: string[] = []
@@ -55,6 +56,7 @@ export async function addProduct(formData: FormData) {
                 description,
                 images: images.join(','), // CSV for SQLite/Legacy Util compatibility
                 category,
+                collectionName,
                 isFeatured,
                 showOnHome,
                 isNewArrival,
@@ -100,6 +102,7 @@ export async function updateProduct(productId: string, formData: FormData) {
         const description = formData.get("description") as string || ""
         const imagesRaw = formData.get("images") as string
         const category = formData.get("category") as string
+        const collectionName = formData.get("collectionName") as string || null
         const status = formData.get("status") as string || "active"
 
         let images: string[] = []
@@ -126,12 +129,13 @@ export async function updateProduct(productId: string, formData: FormData) {
                 description,
                 images: images.join(','),
                 category,
+                collectionName,
                 isFeatured,
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
                 colors,
-                customCategorySlug: formData.get("customCategorySlug") as string,
+                customCategorySlug: formData.get("customCategorySlug") as string || null,
             },
         })
 

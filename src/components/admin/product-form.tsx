@@ -32,13 +32,22 @@ import { ImageUpload } from "@/components/ui/image-upload"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-const CATEGORIES = [
+// Main Product Types (for filtering)
+const MAIN_CATEGORIES = [
+    "Hijabs",
+    "Khimars",
+    "Packs",
+    "Accessoires"
+]
+
+// Fabric/Collection Names (optional, for display)
+const COLLECTIONS = [
     "Soie de Médine",
     "Jersey Luxe",
     "Crêpe Premium",
     "Mousseline",
-    "Packs",
-    "Accessoires"
+    "Best Seller",
+    "Nouveauté"
 ]
 
 const formSchema = z.object({
@@ -48,6 +57,7 @@ const formSchema = z.object({
     compareAtPrice: z.coerce.number().optional(),
     stock: z.coerce.number().default(0),
     category: z.string().min(1, "La catégorie est requise"),
+    collectionName: z.string().optional(), // NEW: Fabric/Collection
     images: z.array(z.string()).min(1, "Au moins une image est requise"),
     status: z.enum(["active", "draft"]).default("active"),
     isFeatured: z.boolean().default(false),
@@ -78,13 +88,15 @@ export function ProductForm({ initialData }: ProductFormProps) {
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
         customCategorySlug: initialData.customCategorySlug || "",
+        collectionName: initialData.collectionName || "",
     } : {
         name: "",
         description: "",
         price: 0,
         compareAtPrice: 0,
         stock: 0,
-        category: "Soie de Médine",
+        category: "Hijabs", // Default to Hijabs
+        collectionName: "",
         images: [],
         status: "active",
         isFeatured: false,
@@ -114,6 +126,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
         formData.append("stock", values.stock.toString())
         formData.append("category", values.category)
+        formData.append("collectionName", values.collectionName || "")
         formData.append("customCategorySlug", values.customCategorySlug || "")
 
         // Serialiser le tableau d'images en JSON pour l'envoyer proprement
@@ -364,26 +377,60 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                     <CardTitle className="text-base font-semibold text-gray-900">Organisation</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
+                                    {/* Main Category Dropdown */}
                                     <FormField
                                         control={form.control}
                                         name="category"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Catégorie</FormLabel>
+                                                <FormLabel>Catégorie Principale *</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="border-gray-300 focus:ring-black">
-                                                            <SelectValue placeholder="Choisir une catégorie" />
+                                                            <SelectValue placeholder="Choisir un type" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {CATEGORIES.map((cat) => (
+                                                        {MAIN_CATEGORIES.map((cat) => (
                                                             <SelectItem key={cat} value={cat}>
                                                                 {cat}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
+                                                <FormDescription className="text-xs">
+                                                    Type de produit (utilisé pour le filtrage)
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* Collection/Fabric Dropdown */}
+                                    <FormField
+                                        control={form.control}
+                                        name="collectionName"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tissu / Collection</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="border-gray-300 focus:ring-black">
+                                                            <SelectValue placeholder="Aucune (optionnel)" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="">Aucune</SelectItem>
+                                                        {COLLECTIONS.map((col) => (
+                                                            <SelectItem key={col} value={col}>
+                                                                {col}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription className="text-xs">
+                                                    Matière ou collection spéciale (affiché sur la carte produit)
+                                                </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
