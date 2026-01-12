@@ -158,9 +158,46 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
                         </div>
                     )}
 
-                    <p className="text-muted-foreground leading-relaxed text-base md:text-lg border-b pb-6 mb-6">
-                        {product.description || "Description à venir."}
-                    </p>
+                    {/* Product Details Accordion */}
+                    <Accordion type="single" collapsible className="mb-6">
+                        <AccordionItem value="description" className="border-b">
+                            <AccordionTrigger className="text-base font-medium hover:no-underline py-4">
+                                Description
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                                    {product.description || "Description à venir."}
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+
+                        <AccordionItem value="shipping" className="border-b">
+                            <AccordionTrigger className="text-base font-medium hover:no-underline py-4">
+                                Livraison & Retour
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-3 text-muted-foreground">
+                                    <div className="flex items-start gap-2">
+                                        <Truck className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <p className="font-medium text-foreground">Livraison partout au Maroc</p>
+                                            <p className="text-sm">Délai de livraison : 2-5 jours ouvrables</p>
+                                            {product.isFreeShipping && (
+                                                <p className="text-sm text-green-600 font-medium mt-1">✓ Livraison gratuite sur ce produit</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <ShieldCheck className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <p className="font-medium text-foreground">Retours faciles</p>
+                                            <p className="text-sm">Retour gratuit sous 14 jours si le produit ne vous convient pas</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
 
                     {/* Quantity Selector */}
                     <div className="mb-4">
