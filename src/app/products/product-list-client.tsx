@@ -88,24 +88,18 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
             }
         }
 
-        // Category Filter (STRICT & SMART)
+        // Category Filter (FLEXIBLE & CASE-INSENSITIVE)
         if (selectedCategory) {
-            const paramSlug = slugify(selectedCategory)
+            const paramLower = selectedCategory.toLowerCase().trim()
+            const catLower = (product.originalCategory || "").toLowerCase().trim()
+            const customLower = (product.customCategorySlug || "").toLowerCase().trim()
 
-            const catSlug = slugify(product.originalCategory || "")
-            const customSlug = product.customCategorySlug ? slugify(product.customCategorySlug) : ""
+            // Check if the param is contained in category OR custom slug
+            // This handles: "hijab" matching "Hijabs", "pack" matching "Packs", etc.
+            const matchesCategory = catLower.includes(paramLower)
+            const matchesCustom = customLower.includes(paramLower)
 
-            // STRICT MATCH: Param Slug object MUST equal Category Slug OR Custom Slug
-            // OR Param Slug must be contained if it's a partial search (e.g. "pack" matching "packs-exclusifs")
-
-            // 1. Try Exact Slug Match
-            const exactMatch = (catSlug === paramSlug) || (customSlug === paramSlug)
-
-            // 2. Try Partial Match (for plural robustness like 'pack' vs 'packs')
-            // Only if "Strict" doesn't mean "Exact". "Strict" usually means "Don't look in Title".
-            const partialMatch = catSlug.includes(paramSlug) || customSlug.includes(paramSlug) || paramSlug.includes(catSlug)
-
-            if (!exactMatch && !partialMatch) return false
+            if (!matchesCategory && !matchesCustom) return false
         }
 
         return true
