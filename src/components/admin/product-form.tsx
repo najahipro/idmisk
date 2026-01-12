@@ -2,10 +2,10 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import * as z from "zod"
-import { Plus, Loader2, Trash, Save, ArrowLeft } from "lucide-react"
-import { useRouter, useParams } from "next/navigation"
+import { Plus, Loader2, Save, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,23 +32,24 @@ import { ImageUpload } from "@/components/ui/image-upload"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-// Main Product Types (for filtering)
-const MAIN_CATEGORIES = [
-    "Hijabs",
-    "Khimars",
-    "Packs",
-    "Accessoires"
-]
+// ✅ LISTE J-JDIDA (Mokhtalita: Type + Tissu)
+const UNIFIED_CATEGORIES = [
+    // --- HIJABS ---
+    "Hijab Soie de Médine",
+    "Hijab Jersey Luxe",
+    "Hijab Crêpe Premium",
+    "Hijab Mousseline",
 
-// Fabric/Collection Names (optional, for display)
-const COLLECTIONS = [
-    "Soie de Médine",
-    "Jersey Luxe",
-    "Crêpe Premium",
-    "Mousseline",
-    "Best Seller",
-    "Nouveauté"
-]
+    // --- KHIMARS ---
+    "Khimar Simple",
+    "Khimar 3 Voiles",
+
+    // --- PACKS & AUTRES ---
+    "Pack Exclusif",
+    "Accessoires",
+    "Nouveauté",
+    "Best Seller"
+];
 
 const formSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
@@ -56,14 +57,14 @@ const formSchema = z.object({
     price: z.coerce.number().min(1, "Le prix est requis"),
     compareAtPrice: z.coerce.number().optional(),
     stock: z.coerce.number().default(0),
-    category: z.string().min(1, "La catégorie est requise"),
-    collectionName: z.string().optional(), // NEW: Fabric/Collection
+    category: z.string().min(1, "La catégorie est requise"), // Hna an-jm3o kolchi
+    // collectionName: z.string().optional(), // ❌ Mss7naha (Ma bqinach 7tajinaha)
     images: z.array(z.string()).min(1, "Au moins une image est requise"),
     status: z.enum(["active", "draft"]).default("active"),
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
-    colors: z.string().optional(), // Comma separated
+    colors: z.string().optional(),
     customCategorySlug: z.string().optional(),
 })
 
@@ -75,33 +76,25 @@ interface ProductFormProps {
 
 export function ProductForm({ initialData }: ProductFormProps) {
     const router = useRouter()
-    const params = useParams()
 
-    // We check if we are in Edit mode
     const isEdit = !!initialData
     const title = isEdit ? "Modifier le produit" : "Ajouter un produit"
     const action = isEdit ? "Enregistrer les modifications" : "Créer le produit"
-
-    // Safety check: Ensure category is valid, fallback for legacy data
-    const isValidCategory = (cat: string) => MAIN_CATEGORIES.includes(cat)
 
     const defaultValues = initialData ? {
         ...initialData,
         price: parseFloat(String(initialData.price)),
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
-        customCategorySlug: initialData.customCategorySlug || "",
-        collectionName: initialData.collectionName || "",
-        // SAFETY: If legacy category (e.g., "Soie de Médine"), default to "Hijabs"
-        category: isValidCategory(initialData.category) ? initialData.category : "Hijabs",
+        // ✅ Ila kant category qdima, n-khlliwha, walla n-dirou default
+        category: initialData.category || "Hijab Soie de Médine",
     } : {
         name: "",
         description: "",
         price: 0,
         compareAtPrice: 0,
         stock: 0,
-        category: "Hijabs", // Default to Hijabs
-        collectionName: "",
+        category: "Hijab Soie de Médine", // Default value
         images: [],
         status: "active",
         isFeatured: false,
@@ -130,20 +123,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
         }
 
         formData.append("stock", values.stock.toString())
+
+        // ✅ Hna Category fiha kolchi (Hijab + Soie)
         formData.append("category", values.category)
-        formData.append("collectionName", values.collectionName || "")
+        formData.append("collectionName", "") // N-siftoha khawya bach ma t-bkich Database
         formData.append("customCategorySlug", values.customCategorySlug || "")
 
-        // Serialiser le tableau d'images en JSON pour l'envoyer proprement
         formData.append("images", JSON.stringify(values.images))
-
         formData.append("colors", values.colors || "")
         formData.append("status", values.status)
         formData.append("isFeatured", values.isFeatured ? "on" : "off")
         formData.append("isNewArrival", values.isNewArrival ? "on" : "off")
         formData.append("isFreeShipping", values.isFreeShipping ? "on" : "off")
 
-        // Map Status to showOnHome logic
         const showOnHome = values.status === "active"
         formData.append("showOnHome", showOnHome ? "on" : "off")
 
@@ -160,9 +152,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                 return
             }
 
-            // Success message could be toast, but alert is fine as per request
-            // alert(isEdit ? "Produit modifié !" : "Produit créé !")
-
+            // ✅ Fix: router.refresh() maktouba mzyan
             router.refresh()
             router.push("/admin/products")
 
@@ -174,7 +164,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
     return (
         <div className="space-y-4">
-            {/* Header with Back Button if Edit */}
             {isEdit && (
                 <div className="flex items-center gap-4 mb-4">
                     <Button variant="outline" size="icon" onClick={() => router.push('/admin/products')}>
@@ -242,12 +231,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                     <ImageUpload
                                                         value={field.value.map((image) => image)}
                                                         disabled={isSubmitting}
-                                                        onChange={(newUrl) => {
-                                                            field.onChange(newUrl)
-                                                        }}
+                                                        onChange={(newUrl) => field.onChange(newUrl)}
                                                         onAdd={(url) => {
-                                                            // Fix for multiple upload race condition:
-                                                            // Always fetch the LATEST value from the form store
                                                             const currentImages = form.getValues("images") || [];
                                                             field.onChange([...currentImages, url]);
                                                         }}
@@ -338,7 +323,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                     </div>
                                 </CardContent>
                             </Card>
-
                         </div>
 
                         {/* === RIGHT COLUMN (1/3) === */}
@@ -376,27 +360,28 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Card 6: Organization */}
+                            {/* Card 6: Organization (UNIFIED BOX) */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
                                     <CardTitle className="text-base font-semibold text-gray-900">Organisation</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    {/* Main Category Dropdown */}
+
+                                    {/* ✅ KHANA WA7DA FIHA KOLCHI */}
                                     <FormField
                                         control={form.control}
                                         name="category"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Catégorie Principale *</FormLabel>
+                                                <FormLabel>Catégorie & Collection</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="border-gray-300 focus:ring-black">
-                                                            <SelectValue placeholder="Choisir un type" />
+                                                            <SelectValue placeholder="Choisir la catégorie..." />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {MAIN_CATEGORIES.map((cat) => (
+                                                        {UNIFIED_CATEGORIES.map((cat) => (
                                                             <SelectItem key={cat} value={cat}>
                                                                 {cat}
                                                             </SelectItem>
@@ -404,37 +389,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                     </SelectContent>
                                                 </Select>
                                                 <FormDescription className="text-xs">
-                                                    Type de produit (utilisé pour le filtrage)
-                                                </FormDescription>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    {/* Collection/Fabric Dropdown */}
-                                    <FormField
-                                        control={form.control}
-                                        name="collectionName"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Tissu / Collection</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger className="border-gray-300 focus:ring-black">
-                                                            <SelectValue placeholder="Aucune (optionnel)" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="">Aucune</SelectItem>
-                                                        {COLLECTIONS.map((col) => (
-                                                            <SelectItem key={col} value={col}>
-                                                                {col}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormDescription className="text-xs">
-                                                    Matière ou collection spéciale (affiché sur la carte produit)
+                                                    Sélectionnez le type exact du produit.
                                                 </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
@@ -448,15 +403,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                                     <div className="space-y-0.5">
-                                                        <FormLabel className="cursor-pointer font-normal">
-                                                            Nouveauté
-                                                        </FormLabel>
+                                                        <FormLabel className="cursor-pointer font-normal">Nouveauté</FormLabel>
                                                     </div>
                                                     <FormControl>
-                                                        <Switch
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
+                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                     </FormControl>
                                                 </FormItem>
                                             )}
@@ -467,15 +417,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
                                                     <div className="space-y-0.5">
-                                                        <FormLabel className="cursor-pointer font-normal">
-                                                            Best Seller
-                                                        </FormLabel>
+                                                        <FormLabel className="cursor-pointer font-normal">Best Seller</FormLabel>
                                                     </div>
                                                     <FormControl>
-                                                        <Switch
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
+                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                     </FormControl>
                                                 </FormItem>
                                             )}
@@ -487,15 +432,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mt-4">
                                                     <div className="space-y-0.5">
                                                         <FormLabel>Livraison Gratuite</FormLabel>
-                                                        <FormDescription className="text-xs">
-                                                            التوصيل فابور لهذا المنتج
-                                                        </FormDescription>
+                                                        <FormDescription className="text-xs">التوصيل فابور لهذا المنتج</FormDescription>
                                                     </div>
                                                     <FormControl>
-                                                        <Switch
-                                                            checked={field.value}
-                                                            onCheckedChange={field.onChange}
-                                                        />
+                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                     </FormControl>
                                                 </FormItem>
                                             )}
@@ -504,7 +444,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Submit Action */}
                             <div className="flex justify-end pt-4">
                                 <Button type="submit" size="lg" className="w-full font-bold bg-black hover:bg-gray-800 text-white" disabled={isSubmitting}>
                                     {isSubmitting ? (

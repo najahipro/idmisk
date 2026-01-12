@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trash, RefreshCw, MoreHorizontal, ArrowUpDown, ImageOff, Pencil } from "lucide-react"
+import { Trash, RefreshCw, ArrowUpDown, ImageOff, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useRouter } from "next/navigation"
@@ -9,10 +9,8 @@ import { ProductForm } from "@/components/admin/product-form"
 import { deleteProduct } from "@/actions/products"
 import { DataTable } from "@/components/ui/data-table"
 import { ColumnDef } from "@tanstack/react-table"
-import { getMainImage } from "@/lib/utils"
-// import { Product } from "@prisma/client" // Ideally we import from prisma, but for now we define a compatible type or use any if prisma types aren't generated client side easily in this setup without running generate.
-// Let's define a Shape that matches what we expect from the Server Action return.
 
+// 1. Ha ch-chkel d-Produit kifach kay-ji mn Server
 export type Product = {
     id: string
     name: string
@@ -29,9 +27,6 @@ interface ProductsClientProps {
 
 export function ProductsClient({ initialProducts }: ProductsClientProps) {
     const router = useRouter()
-
-    // We can rely on router.refresh() for updates, so purely local state isn't strictly needed for validity 
-    // but useful for optimistic UI if we want. For now, let's keep it simple with router refresh.
 
     const handleDelete = async (id: string) => {
         if (!confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) return
@@ -51,11 +46,10 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
                 const images = row.original.images
                 let imageUrl = ""
 
-                // Safe handling for string[] (Schema V2) or string (Schema V1 legacy)
+                // 2. Hna kan-3aljo t-tsawer kifma kanou (Array awla String)
                 if (Array.isArray(images) && images.length > 0) {
                     imageUrl = images[0]
                 } else if (typeof images === 'string') {
-                    // Legacy fallback
                     imageUrl = images.split(',')[0]
                 }
 
@@ -96,12 +90,22 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             header: "Catégorie",
             cell: ({ row }) => {
                 const category = row.original.category
-                const validCategories = ["Hijabs", "Khimars", "Packs", "Accessoires"]
+
+                // 3. 🚨 HNA KAN L-MOJRIM! Daba zdt Categories Jdad
+                const validCategories = [
+                    // Qdam
+                    "Hijabs", "Khimars", "Packs", "Accessoires",
+                    // Jdad (Unified)
+                    "Hijab Soie de Médine", "Hijab Jersey Luxe", "Hijab Crêpe Premium", "Hijab Mousseline",
+                    "Khimar Simple", "Khimar 3 Voiles",
+                    "Pack Exclusif", "Nouveauté", "Best Seller"
+                ]
+
                 const isLegacy = !validCategories.includes(category)
 
                 return (
                     <div className="flex items-center gap-2">
-                        <span className={isLegacy ? "text-orange-600 font-medium" : ""}>
+                        <span className={isLegacy ? "text-orange-600 font-medium" : "text-gray-900 font-medium"}>
                             {category}
                         </span>
                         {isLegacy && (
@@ -164,6 +168,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
                     <h2 className="text-2xl font-bold">Ajouter un produit</h2>
                     <span className="text-muted-foreground text-sm uppercase tracking-wider bg-muted px-2 py-0.5 rounded">Nouveau</span>
                 </div>
+                {/* 4. Hna kan-3iyyto 3la l-Formulaire li sll7ti qbila */}
                 <ProductForm />
             </div>
 
