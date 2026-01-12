@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import * as z from "zod"
-import { Plus, Loader2, Save, ArrowLeft } from "lucide-react"
+import { Plus, Loader2, Save, ArrowLeft, Trash } from "lucide-react" // ✅ Zdt Trash hna
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -32,23 +32,12 @@ import { ImageUpload } from "@/components/ui/image-upload"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-// ✅ LISTE J-JDIDA (Mokhtalita: Type + Tissu)
-const UNIFIED_CATEGORIES = [
-    // --- HIJABS ---
-    "Hijab Soie de Médine",
-    "Hijab Jersey Luxe",
-    "Hijab Crêpe Premium",
-    "Hijab Mousseline",
-
-    // --- KHIMARS ---
-    "Khimar Simple",
-    "Khimar 3 Voiles",
-
-    // --- PACKS & AUTRES ---
-    "Pack Exclusif",
-    "Accessoires",
-    "Nouveauté",
-    "Best Seller"
+// ✅ HNA L-MOHEM: Nafs Smiyat li f Filter b dbt (Kifma bghiti)
+const SIMPLE_CATEGORIES = [
+    "Hijabs",
+    "Khimars",
+    "Packs Exclusifs", // ✅ Hada kifma mktoub f tswira dyal Filter
+    "Accessoires"
 ];
 
 const formSchema = z.object({
@@ -57,8 +46,7 @@ const formSchema = z.object({
     price: z.coerce.number().min(1, "Le prix est requis"),
     compareAtPrice: z.coerce.number().optional(),
     stock: z.coerce.number().default(0),
-    category: z.string().min(1, "La catégorie est requise"), // Hna an-jm3o kolchi
-    // collectionName: z.string().optional(), // ❌ Mss7naha (Ma bqinach 7tajinaha)
+    category: z.string().min(1, "La catégorie est requise"),
     images: z.array(z.string()).min(1, "Au moins une image est requise"),
     status: z.enum(["active", "draft"]).default("active"),
     isFeatured: z.boolean().default(false),
@@ -79,22 +67,22 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
     const isEdit = !!initialData
     const title = isEdit ? "Modifier le produit" : "Ajouter un produit"
-    const action = isEdit ? "Enregistrer les modifications" : "Créer le produit"
+    const action = isEdit ? "Enregistrer" : "Créer le produit"
 
     const defaultValues = initialData ? {
         ...initialData,
         price: parseFloat(String(initialData.price)),
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
-        // ✅ Ila kant category qdima, n-khlliwha, walla n-dirou default
-        category: initialData.category || "Hijab Soie de Médine",
+        // ✅ Ila kanet category qdima mkhlta (Soie..), rje3ha l Hijabs par défaut bach ma t-bloquich
+        category: SIMPLE_CATEGORIES.includes(initialData.category) ? initialData.category : "Hijabs",
     } : {
         name: "",
         description: "",
         price: 0,
         compareAtPrice: 0,
         stock: 0,
-        category: "Hijab Soie de Médine", // Default value
+        category: "Hijabs", // Default simple
         images: [],
         status: "active",
         isFeatured: false,
@@ -113,6 +101,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
     const { isSubmitting } = form.formState
 
     const onSubmit = async (values: ProductFormValues) => {
+        // ✅ Hna kan-nqi l-Form Data
         const formData = new FormData()
         formData.append("name", values.name)
         formData.append("description", values.description)
@@ -123,10 +112,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
         }
 
         formData.append("stock", values.stock.toString())
+        formData.append("category", values.category) // Hna ghadi t-mchi ghir "Hijabs" awla "Khimars" sf.
 
-        // ✅ Hna Category fiha kolchi (Hijab + Soie)
-        formData.append("category", values.category)
-        formData.append("collectionName", "") // N-siftoha khawya bach ma t-bkich Database
+        // N-sifto hadou khawyin bach Database ma dirch sda3
+        formData.append("collectionName", "")
         formData.append("customCategorySlug", values.customCategorySlug || "")
 
         formData.append("images", JSON.stringify(values.images))
@@ -148,17 +137,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
             }
 
             if (result?.error) {
-                alert(result.error)
+                alert("Erreur: " + result.error)
                 return
             }
 
-            // ✅ Fix: router.refresh() maktouba mzyan
             router.refresh()
             router.push("/admin/products")
 
         } catch (error) {
             console.error(error)
-            alert("Une erreur inattendue est survenue")
+            alert("Une erreur inattendue est survenue lors de l'enregistrement.")
         }
     }
 
@@ -179,7 +167,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
                         {/* === LEFT COLUMN (2/3) === */}
                         <div className="lg:col-span-2 space-y-6">
-
                             {/* Card 1: Title & Description */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardContent className="pt-6 space-y-4">
@@ -190,7 +177,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             <FormItem>
                                                 <FormLabel className="font-semibold text-gray-900">Titre</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Nom du produit" className="border-gray-300 focus-visible:ring-black" {...field} />
+                                                    <Input placeholder="Nom du produit" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -204,8 +191,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 <FormLabel className="font-semibold text-gray-900">Description</FormLabel>
                                                 <FormControl>
                                                     <Textarea
-                                                        placeholder="Description détaillée du produit..."
-                                                        className="min-h-[200px] border-gray-300 focus-visible:ring-black resize-y"
+                                                        placeholder="Description détaillée..."
+                                                        className="min-h-[200px]"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -219,7 +206,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                             {/* Card 2: Media */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Médias (Multi-images)</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Médias</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <FormField
@@ -229,16 +216,11 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             <FormItem>
                                                 <FormControl>
                                                     <ImageUpload
-                                                        value={field.value.map((image) => image)}
+                                                        value={field.value}
                                                         disabled={isSubmitting}
-                                                        onChange={(newUrl) => field.onChange(newUrl)}
-                                                        onAdd={(url) => {
-                                                            const currentImages = form.getValues("images") || [];
-                                                            field.onChange([...currentImages, url]);
-                                                        }}
-                                                        onRemove={(urlToRemove) => {
-                                                            field.onChange(field.value.filter((current) => current !== urlToRemove))
-                                                        }}
+                                                        onChange={(newUrl) => field.onChange([...field.value, newUrl])} // Fix upload array
+                                                        onRemove={(url) => field.onChange(field.value.filter((current) => current !== url))}
+                                                        onAdd={(url) => field.onChange([...field.value, url])}
                                                     />
                                                 </FormControl>
                                                 <FormMessage />
@@ -248,10 +230,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Card 3: Pricing */}
+                            {/* Card 3: Pricing & Stock */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Prix</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Prix & Stock</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-2 gap-4">
@@ -262,60 +244,21 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 <FormItem>
                                                     <FormLabel>Prix (DH)</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="0.00" className="border-gray-300 focus-visible:ring-black" {...field} />
+                                                        <Input type="number" placeholder="0.00" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name="compareAtPrice"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Prix comparé (DH)</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="number" placeholder="0.00" className="border-gray-300 focus-visible:ring-black" {...field} />
-                                                    </FormControl>
-                                                    <FormDescription className="text-xs">Pour afficher une solde</FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Card 4: Inventory & Variants */}
-                            <Card className="bg-white border-border shadow-sm">
-                                <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Stocks & Variantes</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
                                             name="stock"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Quantité</FormLabel>
+                                                    <FormLabel>Stock</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" className="border-gray-300 focus-visible:ring-black" {...field} />
+                                                        <Input type="number" {...field} />
                                                     </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="colors"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Couleurs</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Rouge, Bleu, Noir..." className="border-gray-300 focus-visible:ring-black" {...field} />
-                                                    </FormControl>
-                                                    <FormDescription className="text-xs">Séparez les couleurs par des virgules</FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
@@ -328,31 +271,32 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         {/* === RIGHT COLUMN (1/3) === */}
                         <div className="lg:col-span-1 space-y-6">
 
-                            {/* Card 5: Status */}
+                            {/* Card 4: Organisation (SIMPLE) */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">État du produit</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Organisation</CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="space-y-6">
                                     <FormField
                                         control={form.control}
-                                        name="status"
+                                        name="category"
                                         render={({ field }) => (
                                             <FormItem>
+                                                <FormLabel>Catégorie (Filter)</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
-                                                        <SelectTrigger className="border-gray-300 focus:ring-black">
-                                                            <SelectValue placeholder="Sélectionner un état" />
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Choisir la catégorie" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="active">Actif</SelectItem>
-                                                        <SelectItem value="draft">Brouillon</SelectItem>
+                                                        {SIMPLE_CATEGORIES.map((cat) => (
+                                                            <SelectItem key={cat} value={cat}>
+                                                                {cat}
+                                                            </SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
-                                                <FormDescription className="text-xs mt-2">
-                                                    Ce produit sera {field.value === 'active' ? 'visible' : 'caché'} sur la boutique.
-                                                </FormDescription>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -360,83 +304,48 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Card 6: Organization (UNIFIED BOX) */}
+                            {/* Card 5: Status & Options */}
                             <Card className="bg-white border-border shadow-sm">
-                                <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Organisation</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-
-                                    {/* ✅ KHANA WA7DA FIHA KOLCHI */}
+                                <CardContent className="pt-6 space-y-4">
                                     <FormField
                                         control={form.control}
-                                        name="category"
+                                        name="status"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Catégorie & Collection</FormLabel>
+                                                <FormLabel>État</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
-                                                        <SelectTrigger className="border-gray-300 focus:ring-black">
-                                                            <SelectValue placeholder="Choisir la catégorie..." />
+                                                        <SelectTrigger>
+                                                            <SelectValue />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {UNIFIED_CATEGORIES.map((cat) => (
-                                                            <SelectItem key={cat} value={cat}>
-                                                                {cat}
-                                                            </SelectItem>
-                                                        ))}
+                                                        <SelectItem value="active">Actif (Visible)</SelectItem>
+                                                        <SelectItem value="draft">Brouillon (Caché)</SelectItem>
                                                     </SelectContent>
                                                 </Select>
-                                                <FormDescription className="text-xs">
-                                                    Sélectionnez le type exact du produit.
-                                                </FormDescription>
-                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
 
-                                    <div className="space-y-3 pt-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="isNewArrival"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel className="cursor-pointer font-normal">Nouveauté</FormLabel>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
+                                    <div className="space-y-3">
                                         <FormField
                                             control={form.control}
                                             name="isFeatured"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel className="cursor-pointer font-normal">Best Seller</FormLabel>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                    </FormControl>
+                                                <FormItem className="flex items-center justify-between border rounded p-2">
+                                                    <FormLabel className="cursor-pointer">Best Seller</FormLabel>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormItem>
                                             )}
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="isFreeShipping"
+                                            name="isNewArrival"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm mt-4">
-                                                    <div className="space-y-0.5">
-                                                        <FormLabel>Livraison Gratuite</FormLabel>
-                                                        <FormDescription className="text-xs">التوصيل فابور لهذا المنتج</FormDescription>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                                                    </FormControl>
+                                                <FormItem className="flex items-center justify-between border rounded p-2">
+                                                    <FormLabel className="cursor-pointer">Nouveauté</FormLabel>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormItem>
                                             )}
                                         />
@@ -444,19 +353,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            <div className="flex justify-end pt-4">
-                                <Button type="submit" size="lg" className="w-full font-bold bg-black hover:bg-gray-800 text-white" disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Enregistrement...
-                                        </>
-                                    ) : (
-                                        <>
-                                            {isEdit ? <Save className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />} {action}
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
+                            <Button type="submit" size="lg" className="w-full bg-black text-white hover:bg-gray-800" disabled={isSubmitting}>
+                                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                                {action}
+                            </Button>
                         </div>
                     </div>
                 </form>
