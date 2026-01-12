@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import * as z from "zod"
-import { Plus, Loader2, Save, ArrowLeft, Trash } from "lucide-react" // ✅ Zdt Trash hna
+import { Plus, Loader2, Save, ArrowLeft, Trash, Truck } from "lucide-react" // ✅ Zdt Truck icon
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -32,11 +32,11 @@ import { ImageUpload } from "@/components/ui/image-upload"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-// ✅ HNA L-MOHEM: Nafs Smiyat li f Filter b dbt (Kifma bghiti)
+// ✅ CATEGORIES BASITA (Kifma f Filter)
 const SIMPLE_CATEGORIES = [
     "Hijabs",
     "Khimars",
-    "Packs Exclusifs", // ✅ Hada kifma mktoub f tswira dyal Filter
+    "Packs Exclusifs",
     "Accessoires"
 ];
 
@@ -51,7 +51,7 @@ const formSchema = z.object({
     status: z.enum(["active", "draft"]).default("active"),
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
-    isFreeShipping: z.boolean().default(false),
+    isFreeShipping: z.boolean().default(false), // ✅ Hadi hiya li kant naqsa
     colors: z.string().optional(),
     customCategorySlug: z.string().optional(),
 })
@@ -74,20 +74,21 @@ export function ProductForm({ initialData }: ProductFormProps) {
         price: parseFloat(String(initialData.price)),
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
-        // ✅ Ila kanet category qdima mkhlta (Soie..), rje3ha l Hijabs par défaut bach ma t-bloquich
+        // Fallback simple
         category: SIMPLE_CATEGORIES.includes(initialData.category) ? initialData.category : "Hijabs",
+        isFreeShipping: initialData.isFreeShipping || false, // ✅ Default value fix
     } : {
         name: "",
         description: "",
         price: 0,
         compareAtPrice: 0,
         stock: 0,
-        category: "Hijabs", // Default simple
+        category: "Hijabs",
         images: [],
         status: "active",
         isFeatured: false,
         isNewArrival: false,
-        isFreeShipping: false,
+        isFreeShipping: false, // ✅ Default false
         colors: "",
         customCategorySlug: "",
     }
@@ -101,7 +102,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
     const { isSubmitting } = form.formState
 
     const onSubmit = async (values: ProductFormValues) => {
-        // ✅ Hna kan-nqi l-Form Data
         const formData = new FormData()
         formData.append("name", values.name)
         formData.append("description", values.description)
@@ -112,18 +112,20 @@ export function ProductForm({ initialData }: ProductFormProps) {
         }
 
         formData.append("stock", values.stock.toString())
-        formData.append("category", values.category) // Hna ghadi t-mchi ghir "Hijabs" awla "Khimars" sf.
+        formData.append("category", values.category)
 
-        // N-sifto hadou khawyin bach Database ma dirch sda3
+        // ✅ Fix IMPORTANT: N-sifto hadou khawyin bach Database ma dirch Blocage
         formData.append("collectionName", "")
         formData.append("customCategorySlug", values.customCategorySlug || "")
 
         formData.append("images", JSON.stringify(values.images))
         formData.append("colors", values.colors || "")
         formData.append("status", values.status)
+
+        // ✅ Checkbox Handling (on/off)
         formData.append("isFeatured", values.isFeatured ? "on" : "off")
         formData.append("isNewArrival", values.isNewArrival ? "on" : "off")
-        formData.append("isFreeShipping", values.isFreeShipping ? "on" : "off")
+        formData.append("isFreeShipping", values.isFreeShipping ? "on" : "off") // ✅ Hada howa l-mohim
 
         const showOnHome = values.status === "active"
         formData.append("showOnHome", showOnHome ? "on" : "off")
@@ -146,7 +148,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
         } catch (error) {
             console.error(error)
-            alert("Une erreur inattendue est survenue lors de l'enregistrement.")
+            alert("Une erreur inattendue est survenue.")
         }
     }
 
@@ -167,7 +169,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
                         {/* === LEFT COLUMN (2/3) === */}
                         <div className="lg:col-span-2 space-y-6">
-                            {/* Card 1: Title & Description */}
+
+                            {/* Card 1: Info Base */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardContent className="pt-6 space-y-4">
                                     <FormField
@@ -192,7 +195,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Description détaillée..."
-                                                        className="min-h-[200px]"
+                                                        className="min-h-[150px]"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -206,7 +209,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                             {/* Card 2: Media */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Médias</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Images</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <FormField
@@ -218,7 +221,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                     <ImageUpload
                                                         value={field.value}
                                                         disabled={isSubmitting}
-                                                        onChange={(newUrl) => field.onChange([...field.value, newUrl])} // Fix upload array
+                                                        onChange={(newUrl) => field.onChange([...field.value, newUrl])}
                                                         onRemove={(url) => field.onChange(field.value.filter((current) => current !== url))}
                                                         onAdd={(url) => field.onChange([...field.value, url])}
                                                     />
@@ -230,12 +233,12 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Card 3: Pricing & Stock */}
+                            {/* Card 3: Prix & Options (Hna Tawsil Majani!) */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Prix & Stock</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Prix & Livraison</CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="space-y-6">
                                     <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
@@ -252,18 +255,43 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="stock"
+                                            name="compareAtPrice"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Stock</FormLabel>
+                                                    <FormLabel>Prix Promo (Optionnel)</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} />
+                                                        <Input type="number" placeholder="0.00" {...field} />
                                                     </FormControl>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
                                     </div>
+
+                                    {/* ✅ TAWSIL MAJANI - Switch Bayn Hna */}
+                                    <FormField
+                                        control={form.control}
+                                        name="isFreeShipping"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-green-50">
+                                                <div className="space-y-0.5 flex items-center gap-2">
+                                                    <Truck className="h-5 w-5 text-green-600" />
+                                                    <div>
+                                                        <FormLabel className="text-base font-bold text-green-800">Livraison Gratuite</FormLabel>
+                                                        <FormDescription className="text-green-700">
+                                                            Activer pour offrir la livraison sur ce produit.
+                                                        </FormDescription>
+                                                    </div>
+                                                </div>
+                                                <FormControl>
+                                                    <Switch
+                                                        checked={field.value}
+                                                        onCheckedChange={field.onChange}
+                                                        className="data-[state=checked]:bg-green-600"
+                                                    />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </CardContent>
                             </Card>
                         </div>
@@ -271,22 +299,21 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         {/* === RIGHT COLUMN (1/3) === */}
                         <div className="lg:col-span-1 space-y-6">
 
-                            {/* Card 4: Organisation (SIMPLE) */}
+                            {/* Organisation */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-gray-900">Organisation</CardTitle>
+                                    <CardTitle className="text-base font-semibold text-gray-900">Catégorie</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-6">
+                                <CardContent>
                                     <FormField
                                         control={form.control}
                                         name="category"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>Catégorie (Filter)</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
-                                                            <SelectValue placeholder="Choisir la catégorie" />
+                                                            <SelectValue placeholder="Choisir..." />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -304,15 +331,28 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Card 5: Status & Options */}
+                            {/* Stock & État */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardContent className="pt-6 space-y-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="stock"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Stock</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" {...field} />
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+
                                     <FormField
                                         control={form.control}
                                         name="status"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>État</FormLabel>
+                                                <FormLabel>Visibilité</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -320,21 +360,22 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="active">Actif (Visible)</SelectItem>
-                                                        <SelectItem value="draft">Brouillon (Caché)</SelectItem>
+                                                        <SelectItem value="active">Publié</SelectItem>
+                                                        <SelectItem value="draft">Brouillon</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </FormItem>
                                         )}
                                     />
 
-                                    <div className="space-y-3">
+                                    {/* Autres Options */}
+                                    <div className="space-y-2 pt-2">
                                         <FormField
                                             control={form.control}
                                             name="isFeatured"
                                             render={({ field }) => (
-                                                <FormItem className="flex items-center justify-between border rounded p-2">
-                                                    <FormLabel className="cursor-pointer">Best Seller</FormLabel>
+                                                <FormItem className="flex items-center justify-between border-t pt-2">
+                                                    <FormLabel className="cursor-pointer font-normal text-sm">Best Seller</FormLabel>
                                                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormItem>
                                             )}
@@ -343,8 +384,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             control={form.control}
                                             name="isNewArrival"
                                             render={({ field }) => (
-                                                <FormItem className="flex items-center justify-between border rounded p-2">
-                                                    <FormLabel className="cursor-pointer">Nouveauté</FormLabel>
+                                                <FormItem className="flex items-center justify-between border-t pt-2">
+                                                    <FormLabel className="cursor-pointer font-normal text-sm">Nouveauté</FormLabel>
                                                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormItem>
                                             )}
