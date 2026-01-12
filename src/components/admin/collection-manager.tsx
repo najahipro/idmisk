@@ -23,13 +23,13 @@ const CATEGORIES = [
     { label: "Jersey Luxe", value: "jersey" },
     { label: "Crêpe Premium", value: "crepe" },
     { label: "Mousseline", value: "mousseline" },
-    { label: "Hijabs (Tout)", value: "hijab" },
+    { label: "Hijabs", value: "hijab" },
     { label: "Khimars", value: "khimar" },
     { label: "Abayas", value: "abaya" },
     { label: "Packs", value: "packs" },
     { label: "Accessoires", value: "accessoires" },
     { label: "Toutes les catégories", value: "all" },
-    { label: "Nouveautés (Tri)", value: "newest" }, // Special handle for URL
+    { label: "Nouveautés", value: "newest" },
 ]
 
 interface Collection {
