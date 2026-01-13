@@ -52,7 +52,7 @@ export function BestSellers({ products }: BestSellersProps) {
 
                     <CarouselContent className="-ml-1 md:-ml-4 px-0 md:px-12">
                         {bestSellers.map((product) => (
-                            <CarouselItem key={product.id} className="basis-1/2 md:basis-1/3 lg:basis-1/4 pl-1 md:pl-4">
+                            <CarouselItem key={product.id} className="flex-shrink-0 basis-1/2 min-w-[160px] md:basis-1/3 lg:basis-1/4 pl-1 md:pl-4">
                                 <div className="p-1">
                                     <ProductCard product={product} />
                                 </div>
