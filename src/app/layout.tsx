@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Tajawal } from "next/font/google"; // Import Tajawal
+import { Inter, Tajawal } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/cart-context";
-
 import { OrderProvider } from "@/context/order-context";
-
 import { CartSheet } from "@/components/cart/cart-sheet";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { I18nProvider } from "@/components/i18n-provider";
@@ -15,8 +13,10 @@ import { Footer } from "@/components/landing/footer";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Toaster } from "@/components/ui/toaster";
 
+// 1. هنا زدنا المكتبة ديال جوجل أناليتكس
+import { GoogleAnalytics } from '@next/third-parties/google';
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-// const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 const tajawal = Tajawal({ subsets: ["arabic"], weight: ["400", "500", "700"], variable: "--font-arabic" });
 
 export const metadata: Metadata = {
@@ -58,6 +58,9 @@ export default function RootLayout({
                     </CurrencyProvider>
                 </I18nProvider>
             </body>
+
+            {/* 2. هنا حطينا الكومبوننت ديال التتبع بالكود ديالك */}
+            <GoogleAnalytics gaId="G-P24TYY6X8D" />
         </html>
     );
 }
