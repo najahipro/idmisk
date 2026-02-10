@@ -33,7 +33,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-import { getColors, getSizes } from "@/app/admin/settings/actions"
+import { getColors } from "@/app/admin/settings/actions"
 
 // Categories and Colors will be fetched dynamically
 
@@ -65,7 +65,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
     const router = useRouter()
     const [categories, setCategories] = useState<Array<{ id: string, name: string }>>([])
     const [colors, setColors] = useState<Array<{ id: string, name: string, hexCode: string }>>([])
-    const [sizes, setSizes] = useState<Array<{ id: string, name: string, order?: number | null }>>([])
+
     const [loadingData, setLoadingData] = useState(true)
 
     const isEdit = !!initialData
@@ -88,12 +88,6 @@ export function ProductForm({ initialData }: ProductFormProps) {
                 if (colorsResult.success && colorsResult.colors) {
                     setColors(colorsResult.colors)
                 }
-
-                // Fetch Sizes
-                const sizesResult = await getSizes()
-                if (sizesResult.success && sizesResult.sizes) {
-                    setSizes(sizesResult.sizes)
-                }
             } catch (error) {
                 console.error('Failed to fetch data:', error)
             } finally {
@@ -113,8 +107,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
         homepageLocation: (initialData as any).homepageLocation || "NONE",
         // Map initial colors array (objects) to IDs array
         colors: initialData.colors ? initialData.colors.map((c: any) => c.id) : [],
-        // Map initial sizes array (objects) to IDs array
-        sizes: (initialData as any).sizes ? (initialData as any).sizes.map((s: any) => s.id) : [],
+        // Map initial sizes array (objects) to Names array
+        sizes: (initialData as any).sizes ? (initialData as any).sizes.map((s: any) => s.name) : [],
     } : {
         name: "",
         description: "",
@@ -208,15 +202,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
         form.setValue("colors", newColors, { shouldDirty: true })
     }
 
-    // Handle Size Toggle
-    const toggleSize = (sizeId: string) => {
-        const currentSizes = form.getValues("sizes") || []
-        const newSizes = currentSizes.includes(sizeId)
-            ? currentSizes.filter(id => id !== sizeId)
-            : [...currentSizes, sizeId]
 
-        form.setValue("sizes", newSizes, { shouldDirty: true })
-    }
 
     return (
         <div className="space-y-4">
@@ -360,7 +346,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 </CardContent>
                             </Card>
 
-                            {/* Sizes Section */}
+                            {/* Sizes Section - INLINE CREATION */}
                             <Card className="bg-white border-border shadow-sm">
                                 <CardHeader>
                                     <CardTitle>Tailles Disponibles</CardTitle>
@@ -371,28 +357,43 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                         name="sizes"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-                                                    {loadingData ? (
-                                                        <p className="text-sm text-gray-500 col-span-4">Chargement des tailles...</p>
-                                                    ) : sizes.length === 0 ? (
-                                                        <div className="col-span-full text-sm text-gray-500">
-                                                            Aucune taille disponible. Ajoutez-en dans les R�glages.
-                                                        </div>
-                                                    ) : sizes.map((size) => {
-                                                        const isSelected = (field.value || []).includes(size.id)
-                                                        return (
+                                                <div className="space-y-3">
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            placeholder="Ajouter une taille (ex: XL, 40)..."
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    e.preventDefault();
+                                                                    const val = e.currentTarget.value.trim().toUpperCase();
+                                                                    if (val && !field.value.includes(val)) {
+                                                                        field.onChange([...(field.value || []), val]);
+                                                                        e.currentTarget.value = "";
+                                                                    }
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {(field.value || []).map((size: string) => (
                                                             <div
-                                                                key={size.id}
-                                                                onClick={() => toggleSize(size.id)}
-                                                                className={`
-                                                                    cursor-pointer border rounded-lg p-3 flex items-center justify-center transition-all
-                                                                    ${isSelected ? 'border-black bg-black/5 ring-1 ring-black' : 'border-gray-200 hover:border-gray-300'}
-                                                                `}
+                                                                key={size}
+                                                                className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2"
                                                             >
-                                                                <span className="text-sm font-medium text-center">{size.name}</span>
+                                                                {size}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => field.onChange(field.value.filter((s: string) => s !== size))}
+                                                                    className="hover:text-red-300"
+                                                                >
+                                                                    <Trash className="h-3 w-3" />
+                                                                </button>
                                                             </div>
-                                                        )
-                                                    })}
+                                                        ))}
+                                                        {(field.value || []).length === 0 && (
+                                                            <p className="text-sm text-gray-400 italic">Aucune taille sélectionnée.</p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <FormMessage />
                                             </FormItem>

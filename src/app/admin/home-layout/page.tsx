@@ -23,8 +23,11 @@ export default async function HomeLayoutPage() {
                 splitRightCategory: true,
                 createdAt: true,
                 updatedAt: true,
-                // ❌ Exclude Base64 image fields to reduce payload:
-                // heroImage, middleImage, splitLeftImage, splitRightImage
+                // Include image fields to ensure they are not wiped out on save
+                heroImage: true,
+                middleImage: true,
+                splitLeftImage: true,
+                splitRightImage: true,
             }
         })
     } catch (err) {

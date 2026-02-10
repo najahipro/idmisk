@@ -82,7 +82,10 @@ export async function addProduct(formData: FormData) {
                     connect: colorIds.map(id => ({ id }))
                 },
                 sizes: {
-                    connect: sizeIds.map(id => ({ id }))
+                    connectOrCreate: sizeIds.map(name => ({
+                        where: { name },
+                        create: { name }
+                    }))
                 }
             },
         })
@@ -185,7 +188,28 @@ export async function updateProduct(productId: string, formData: FormData) {
                     set: colorIds.map(id => ({ id }))
                 },
                 sizes: {
-                    set: sizeIds.map(id => ({ id }))
+                    // Since 'set' doesn't support 'connectOrCreate', we must disconnect all then connectOrCreate
+                    // But Prisma update 'sizes' relation with 'set' expects references.
+                    // Actually, for M-N with connectOrCreate, it's better to use 'set' to clear and then 'connectOrCreate'.
+                    // However, Prisma doesn't support 'connectOrCreate' inside 'set' directly in one go usually for replacement unless using specific syntax.
+                    // Easier strategy: Delete all relations first? No, that's manual.
+                    // Correct Strategy for Prisma `update`:
+                    // 1. disconnect: { name: {} } ?? No, disconnected everything.
+                    // Let's use `set: []` to clear, but we can't do that AND `connectOrCreate` in same level sometimes.
+                    // Wait, `connectOrCreate` works in `update`.
+                    // To replace the entire list:
+                    // we can pass `set: []` to clear, then `connectOrCreate`.
+                    // But `set` overrides everything.
+                    // Better approach:
+                    // sizes: {
+                    //   set: [], // Disconnect all current
+                    //   connectOrCreate: [...] // Add new ones
+                    // }
+                    set: [], // Clear existing relations
+                    connectOrCreate: sizeIds.map(name => ({
+                        where: { name },
+                        create: { name }
+                    }))
                 },
                 customCategorySlug: formData.get("customCategorySlug") as string || null,
             },
