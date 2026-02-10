@@ -16,7 +16,10 @@ export default async function ProductEditPage({ params }: ProductEditPageProps) 
 
     const product = await db.product.findUnique({
         where: { id: productId },
-        include: { colors: true }
+        include: {
+            colors: true,
+            sizes: true  // Include sizes relationship
+        }
     })
 
     if (!product) {
@@ -35,6 +38,7 @@ export default async function ProductEditPage({ params }: ProductEditPageProps) 
         ...product,
         images,
         colors: product.colors ? product.colors.map((c: any) => c.id) : [],
+        sizes: product.sizes ? product.sizes.map((s: any) => s.id) : [],  // Map sizes to IDs
         status: ((product.status === "active" || product.status === "draft") ? product.status : "active") as "active" | "draft",
         compareAtPrice: product.compareAtPrice ?? undefined,
         homepageLocation: ((product.homepageLocation === "NONE" || product.homepageLocation === "ESSENTIALS" || product.homepageLocation === "EDITORIAL" || product.homepageLocation === "NEW_IN") ? product.homepageLocation : "NONE") as "NONE" | "ESSENTIALS" | "EDITORIAL" | "NEW_IN",

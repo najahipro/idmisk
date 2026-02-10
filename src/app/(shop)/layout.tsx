@@ -4,6 +4,7 @@ import { Footer } from "@/components/landing/footer"
 import { WhatsAppButton } from "@/components/ui/whatsapp-button"
 import { CartSheet } from "@/components/cart/cart-sheet"
 import { db } from "@/lib/db"
+import { getMenuItems } from "@/app/admin/settings/actions"
 
 export default async function ShopLayout({
     children,
@@ -32,10 +33,21 @@ export default async function ShopLayout({
         topBarMessages = ["Livraison Gratuite partout au Maroc !"]
     }
 
+    // Fetch Menu Items
+    let menuItems: any[] = []
+    try {
+        const menuResult = await getMenuItems()
+        if (menuResult.success && menuResult.menuItems) {
+            menuItems = menuResult.menuItems
+        }
+    } catch (error) {
+        console.error("Failed to fetch menu items:", error)
+    }
+
     return (
         <div className="flex flex-col min-h-screen">
             <TopBar messages={topBarMessages} />
-            <Header />
+            <Header menuItems={menuItems} />
             <main className="flex-1">
                 {children}
             </main>

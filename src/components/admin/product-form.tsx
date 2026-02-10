@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,7 +33,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-import { getColors } from "@/app/admin/settings/actions"
+import { getColors, getSizes } from "@/app/admin/settings/actions"
 
 // Categories and Colors will be fetched dynamically
 
@@ -50,20 +50,22 @@ const formSchema = z.object({
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
     homepageLocation: z.enum(["NONE", "ESSENTIALS", "EDITORIAL", "NEW_IN"]).default("NONE"),
-    colors: z.array(z.string()).default([]), // Now an array of ID strings
+    colors: z.array(z.string()).default([]), // Array of color IDs
+    sizes: z.array(z.string()).default([]), // Array of size IDs
     customCategorySlug: z.string().nullish(),
 })
 
 type ProductFormValues = z.infer<typeof formSchema>
 
 interface ProductFormProps {
-    initialData?: (ProductFormValues & { id: string, images: string[], colors?: any[] }) | null
+    initialData?: (ProductFormValues & { id: string, images: string[], colors?: any[], sizes?: any[] }) | null
 }
 
 export function ProductForm({ initialData }: ProductFormProps) {
     const router = useRouter()
     const [categories, setCategories] = useState<Array<{ id: string, name: string }>>([])
     const [colors, setColors] = useState<Array<{ id: string, name: string, hexCode: string }>>([])
+    const [sizes, setSizes] = useState<Array<{ id: string, name: string, order?: number | null }>>([])
     const [loadingData, setLoadingData] = useState(true)
 
     const isEdit = !!initialData
@@ -86,6 +88,12 @@ export function ProductForm({ initialData }: ProductFormProps) {
                 if (colorsResult.success && colorsResult.colors) {
                     setColors(colorsResult.colors)
                 }
+
+                // Fetch Sizes
+                const sizesResult = await getSizes()
+                if (sizesResult.success && sizesResult.sizes) {
+                    setSizes(sizesResult.sizes)
+                }
             } catch (error) {
                 console.error('Failed to fetch data:', error)
             } finally {
@@ -105,6 +113,8 @@ export function ProductForm({ initialData }: ProductFormProps) {
         homepageLocation: (initialData as any).homepageLocation || "NONE",
         // Map initial colors array (objects) to IDs array
         colors: initialData.colors ? initialData.colors.map((c: any) => c.id) : [],
+        // Map initial sizes array (objects) to IDs array
+        sizes: (initialData as any).sizes ? (initialData as any).sizes.map((s: any) => s.id) : [],
     } : {
         name: "",
         description: "",
@@ -119,6 +129,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
         isFreeShipping: false,
         homepageLocation: "NONE",
         colors: [],
+        sizes: [],
         customCategorySlug: "",
     }
 
@@ -151,6 +162,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
         // Pass colors as JSON string of IDs
         formData.append("colors", JSON.stringify(values.colors))
+
+        // Pass sizes as JSON string of IDs
+        formData.append("sizes", JSON.stringify(values.sizes))
 
         formData.append("status", values.status)
 
@@ -192,6 +206,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
             : [...currentColors, colorId]
 
         form.setValue("colors", newColors, { shouldDirty: true })
+    }
+
+    // Handle Size Toggle
+    const toggleSize = (sizeId: string) => {
+        const currentSizes = form.getValues("sizes") || []
+        const newSizes = currentSizes.includes(sizeId)
+            ? currentSizes.filter(id => id !== sizeId)
+            : [...currentSizes, sizeId]
+
+        form.setValue("sizes", newSizes, { shouldDirty: true })
     }
 
     return (
@@ -325,6 +349,47 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                                     style={{ backgroundColor: color.hexCode }}
                                                                 />
                                                                 <span className="text-xs font-medium text-center truncate w-full">{color.name}</span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            {/* Sizes Section */}
+                            <Card className="bg-white border-border shadow-sm">
+                                <CardHeader>
+                                    <CardTitle>Tailles Disponibles</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <FormField
+                                        control={form.control}
+                                        name="sizes"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
+                                                    {loadingData ? (
+                                                        <p className="text-sm text-gray-500 col-span-4">Chargement des tailles...</p>
+                                                    ) : sizes.length === 0 ? (
+                                                        <div className="col-span-full text-sm text-gray-500">
+                                                            Aucune taille disponible. Ajoutez-en dans les R�glages.
+                                                        </div>
+                                                    ) : sizes.map((size) => {
+                                                        const isSelected = (field.value || []).includes(size.id)
+                                                        return (
+                                                            <div
+                                                                key={size.id}
+                                                                onClick={() => toggleSize(size.id)}
+                                                                className={`
+                                                                    cursor-pointer border rounded-lg p-3 flex items-center justify-center transition-all
+                                                                    ${isSelected ? 'border-black bg-black/5 ring-1 ring-black' : 'border-gray-200 hover:border-gray-300'}
+                                                                `}
+                                                            >
+                                                                <span className="text-sm font-medium text-center">{size.name}</span>
                                                             </div>
                                                         )
                                                     })}

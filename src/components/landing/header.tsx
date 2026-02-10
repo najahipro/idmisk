@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, ShoppingBag, User, Truck, LogOut, Package, X, Menu, Phone, Instagram, Facebook } from "lucide-react";
+import { Search, ShoppingBag, User, Truck, LogOut, Package, X, Menu, Phone, Instagram, Facebook, ChevronDown } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { useSession, signOut } from "next-auth/react";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,27 @@ import { Button } from "@/components/ui/button"
 
 import { useTranslation } from "react-i18next";
 
-export function Header() {
+interface SubMenuItem {
+    id: string
+    label: string
+    link: string
+    order: number
+    menuItemId: string
+}
+
+interface MenuItem {
+    id: string
+    label: string
+    link: string
+    order: number
+    children: SubMenuItem[]
+}
+
+interface HeaderProps {
+    menuItems?: MenuItem[]
+}
+
+export function Header({ menuItems = [] }: HeaderProps) {
     const { itemCount, setIsOpen } = useCart();
     const { data: session } = useSession();
     const { t } = useTranslation();
@@ -52,6 +72,10 @@ export function Header() {
         }
     };
 
+    // Use provided menuItems, or fallback to default if empty (only for mobile structure matching or just use dynamic if present)
+    // Actually, if we have dynamic items, we use them. If not, we fall back to hardcoded.
+    const hasDynamicMenu = menuItems && menuItems.length > 0;
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
@@ -65,8 +89,8 @@ export function Header() {
                                 <span className="sr-only">Menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0">
-                            <div className="flex flex-col h-full">
+                        <SheetContent side="left" className="w-[300px] sm:w-[350px] p-0 overflow-y-auto">
+                            <div className="flex flex-col min-h-full">
                                 {/* Sheet Header */}
                                 <div className="p-6 border-b">
                                     <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
@@ -76,45 +100,69 @@ export function Header() {
                                 </div>
 
                                 {/* Links List */}
-                                <nav className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 font-medium text-lg">
+                                <nav className="flex-1 p-6 flex flex-col gap-6 font-medium text-lg">
                                     <SheetClose asChild>
                                         <Link href="/" className="hover:text-primary transition-colors">
                                             Accueil
                                         </Link>
                                     </SheetClose>
 
-                                    <div className="space-y-4">
-                                        <div className="font-bold text-primary text-sm uppercase tracking-widest mb-4">Collection</div>
-                                        <div className="pl-4 flex flex-col gap-4 text-base font-light text-black/80 border-l border-gray-100">
-                                            <SheetClose asChild>
-                                                <Link href="/products?sort=newest" className="block hover:text-black hover:translate-x-1 transition-transform">Nouveautés</Link>
-                                            </SheetClose>
-                                            <SheetClose asChild>
-                                                <Link href="/products?category=femme" className="block hover:text-black hover:translate-x-1 transition-transform">Femme</Link>
-                                            </SheetClose>
-                                            <SheetClose asChild>
-                                                <Link href="/products?category=homme" className="block hover:text-black hover:translate-x-1 transition-transform">Homme</Link>
-                                            </SheetClose>
-                                            <SheetClose asChild>
-                                                <Link href="/products?category=la-maison" className="block hover:text-black hover:translate-x-1 transition-transform">La Maison</Link>
-                                            </SheetClose>
-                                            <SheetClose asChild>
-                                                <Link href="/products?category=accessoires" className="block hover:text-black hover:translate-x-1 transition-transform">Accessoires</Link>
-                                            </SheetClose>
-                                            <SheetClose asChild>
-                                                <Link href="/products" className="block hover:text-black font-medium mt-2 hover:translate-x-1 transition-transform">Tout voir</Link>
-                                            </SheetClose>
+                                    {hasDynamicMenu ? (
+                                        <div className="space-y-6">
+                                            {menuItems.map((item) => (
+                                                <div key={item.id} className="space-y-3">
+                                                    <SheetClose asChild>
+                                                        <Link href={item.link || "#"} className="font-bold text-primary text-sm uppercase tracking-widest mb-2 block">
+                                                            {item.label}
+                                                        </Link>
+                                                    </SheetClose>
+                                                    {item.children && item.children.length > 0 && (
+                                                        <div className="pl-4 flex flex-col gap-3 text-base font-light text-black/80 border-l border-gray-100">
+                                                            {item.children.map((sub) => (
+                                                                <SheetClose key={sub.id} asChild>
+                                                                    <Link href={sub.link} className="block hover:text-black hover:translate-x-1 transition-transform">
+                                                                        {sub.label}
+                                                                    </Link>
+                                                                </SheetClose>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
-                                    </div>
+                                    ) : (
+                                        // Fallback Static Menu
+                                        <div className="space-y-4">
+                                            <div className="font-bold text-primary text-sm uppercase tracking-widest mb-4">Collection</div>
+                                            <div className="pl-4 flex flex-col gap-4 text-base font-light text-black/80 border-l border-gray-100">
+                                                <SheetClose asChild>
+                                                    <Link href="/products?sort=newest" className="block hover:text-black hover:translate-x-1 transition-transform">Nouveautés</Link>
+                                                </SheetClose>
+                                                <SheetClose asChild>
+                                                    <Link href="/products?category=femme" className="block hover:text-black hover:translate-x-1 transition-transform">Femme</Link>
+                                                </SheetClose>
+                                                <SheetClose asChild>
+                                                    <Link href="/products?category=homme" className="block hover:text-black hover:translate-x-1 transition-transform">Homme</Link>
+                                                </SheetClose>
+                                                <SheetClose asChild>
+                                                    <Link href="/products?category=la-maison" className="block hover:text-black hover:translate-x-1 transition-transform">La Maison</Link>
+                                                </SheetClose>
+                                                <SheetClose asChild>
+                                                    <Link href="/products?category=accessoires" className="block hover:text-black hover:translate-x-1 transition-transform">Accessoires</Link>
+                                                </SheetClose>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <SheetClose asChild>
-                                        <Link href="/suivi" className="hover:text-primary transition-colors flex items-center gap-2">
+                                        <Link href="/suivi" className="hover:text-primary transition-colors flex items-center gap-2 mt-4 pt-4 border-t">
                                             <Truck className="w-5 h-5" /> Suivi de commande
                                         </Link>
                                     </SheetClose>
                                 </nav>
 
                                 {/* Bottom Actions */}
-                                <div className="p-6 border-t bg-gray-50/50">
+                                <div className="p-6 border-t bg-gray-50/50 mt-auto">
                                     {!session?.user ? (
                                         <Button asChild className="w-full mb-4" size="lg">
                                             <Link href="/login">Se connecter</Link>
@@ -150,28 +198,66 @@ export function Header() {
                     </Link>
                 </div>
 
-                {/* 2. Center: Navigation (DESKTOP ONLY) */}
-                <nav className="hidden md:flex flex-1 justify-center items-center gap-8 lg:gap-12 text-[13px] font-normal uppercase tracking-[0.2em] text-black">
-                    <Link href="/products?sort=newest" className="relative group hover:text-black/70 transition-colors">
-                        <span>New In</span>
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                    <Link href="/products?category=femme" className="relative group hover:text-black/70 transition-colors">
-                        <span>Femme</span>
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                    <Link href="/products?category=homme" className="relative group hover:text-black/70 transition-colors">
-                        <span>Homme</span>
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                    <Link href="/products?category=la-maison" className="relative group hover:text-black/70 transition-colors">
-                        <span>La Maison</span>
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
-                    <Link href="/products?category=accessoires" className="relative group hover:text-black/70 transition-colors">
-                        <span>Accessoires</span>
-                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
-                    </Link>
+                {/* 2. Center: Navigation (DESKTOP ONLY) - MEGA MENU IMPLEMENTATION */}
+                <nav className="hidden md:flex flex-1 justify-center items-center gap-8 lg:gap-12 text-[13px] font-normal uppercase tracking-[0.2em] text-black h-16 md:h-20">
+                    {hasDynamicMenu ? (
+                        menuItems.map((item) => (
+                            <div key={item.id} className="relative group h-full flex items-center">
+                                <Link
+                                    href={item.link || "#"}
+                                    className="relative flex items-center gap-1 hover:text-black/70 transition-colors py-2"
+                                >
+                                    <span>{item.label}</span>
+                                    {item.children && item.children.length > 0 && (
+                                        <ChevronDown className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                    )}
+                                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                                </Link>
+
+                                {/* MEGA MENU DROPDOWN */}
+                                {item.children && item.children.length > 0 && (
+                                    <div className="absolute top-[95%] left-1/2 -translate-x-1/2 w-56 bg-white shadow-xl border border-gray-100 p-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 rounded-sm translate-y-2 group-hover:translate-y-0">
+                                        <ul className="flex flex-col gap-3">
+                                            {item.children.map((sub) => (
+                                                <li key={sub.id}>
+                                                    <Link
+                                                        href={sub.link}
+                                                        className="block text-gray-600 hover:text-black hover:translate-x-1 transition-all duration-200 font-light normal-case tracking-normal text-sm"
+                                                    >
+                                                        {sub.label}
+                                                    </Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        // Fallback Static Menu
+                        <>
+                            <Link href="/products?sort=newest" className="relative group hover:text-black/70 transition-colors">
+                                <span>New In</span>
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                            <Link href="/products?category=femme" className="relative group hover:text-black/70 transition-colors">
+                                <span>Femme</span>
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                            <Link href="/products?category=homme" className="relative group hover:text-black/70 transition-colors">
+                                <span>Homme</span>
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                            <Link href="/products?category=la-maison" className="relative group hover:text-black/70 transition-colors">
+                                <span>La Maison</span>
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                            <Link href="/products?category=accessoires" className="relative group hover:text-black/70 transition-colors">
+                                <span>Accessoires</span>
+                                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                            </Link>
+                        </>
+                    )}
                 </nav>
 
                 {/* 3. Right: Icons */}

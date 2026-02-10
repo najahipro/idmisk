@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, Save } from "lucide-react"
+import { Plus, Trash2, Save, ChevronDown, ChevronRight, CornerDownRight } from "lucide-react"
 
-import { createColor, deleteColor } from "./actions"
+import { createColor, deleteColor, createMenuItem, deleteMenuItem, createSubMenuItem, deleteSubMenuItem } from "./actions"
 
 interface Category {
     id: string
@@ -17,6 +17,24 @@ interface Color {
     id: string
     name: string
     hexCode: string
+}
+
+
+
+interface SubMenuItem {
+    id: string
+    label: string
+    link: string
+    order: number
+    menuItemId: string
+}
+
+interface MenuItem {
+    id: string
+    label: string
+    link: string
+    order: number
+    children: SubMenuItem[]
 }
 
 interface SiteSettings {
@@ -33,9 +51,10 @@ interface SettingsClientProps {
     initialCategories: Category[]
     initialSettings: SiteSettings | null
     initialColors: Color[]
+    initialMenuItems: MenuItem[]
 }
 
-export default function SettingsClient({ initialCategories, initialSettings, initialColors }: SettingsClientProps) {
+export default function SettingsClient({ initialCategories, initialSettings, initialColors, initialMenuItems }: SettingsClientProps) {
     const router = useRouter()
 
     // Categories State
@@ -46,6 +65,16 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
     const [colors, setColors] = useState<Color[]>(initialColors)
     const [newColorName, setNewColorName] = useState("")
     const [newColorHex, setNewColorHex] = useState("#000000")
+
+
+
+    // Menu Items State
+    const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuItems || [])
+    const [newMenuItemLabel, setNewMenuItemLabel] = useState("")
+    const [newMenuItemLink, setNewMenuItemLink] = useState("")
+
+    // Sub Menu Items State (Temporary state for input)
+    const [subInputs, setSubInputs] = useState<{ [key: string]: { label: string, link: string } }>({})
 
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState("")
@@ -132,7 +161,6 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
             setMessage("✅ Couleur ajoutée avec succès!")
             setNewColorName("")
             setNewColorHex("#000000")
-            // Optimistic update or wait for refresh? Refresh is safer for ID
             router.refresh()
         } else {
             setMessage(`❌ ${result.error || 'Erreur lors de l\'ajout de la couleur'}`)
@@ -151,6 +179,78 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
             router.refresh()
         } else {
             setMessage(`❌ ${result.error || 'Erreur lors de la suppression'}`)
+        }
+        setLoading(false)
+    }
+
+
+
+    // --- MENU HANDLERS ---
+    const handleAddMenuItem = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!newMenuItemLabel.trim()) return
+
+        setLoading(true)
+        setMessage("")
+
+        const result = await createMenuItem(newMenuItemLabel, newMenuItemLink)
+
+        if (result.success) {
+            setMessage("✅ Menu principal ajouté!")
+            setNewMenuItemLabel("")
+            setNewMenuItemLink("")
+            router.refresh()
+        } else {
+            setMessage(`❌ ${result.error || 'Erreur'}`)
+        }
+        setLoading(false)
+    }
+
+    const handleDeleteMenuItem = async (id: string) => {
+        if (!confirm("Supprimer ce menu et tous ses sous-liens?")) return
+
+        setLoading(true)
+        const result = await deleteMenuItem(id)
+
+        if (result.success) {
+            setMessage("✅ Menu supprimé")
+            router.refresh()
+        } else {
+            setMessage(`❌ ${result.error}`)
+        }
+        setLoading(false)
+    }
+
+    const handleAddSubMenuItem = async (menuItemId: string) => {
+        const input = subInputs[menuItemId]
+        if (!input?.label?.trim()) return
+
+        setLoading(true)
+        setMessage("")
+
+        const result = await createSubMenuItem(menuItemId, input.label, input.link)
+
+        if (result.success) {
+            setMessage("✅ Sous-lien ajouté!")
+            setSubInputs(prev => ({ ...prev, [menuItemId]: { label: "", link: "" } }))
+            router.refresh()
+        } else {
+            setMessage(`❌ ${result.error}`)
+        }
+        setLoading(false)
+    }
+
+    const handleDeleteSubMenuItem = async (id: string) => {
+        if (!confirm("Supprimer ce sous-lien?")) return
+
+        setLoading(true)
+        const result = await deleteSubMenuItem(id)
+
+        if (result.success) {
+            setMessage("✅ Sous-lien supprimé")
+            router.refresh()
+        } else {
+            setMessage(`❌ ${result.error}`)
         }
         setLoading(false)
     }
@@ -196,6 +296,131 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
             )}
 
             <div className="space-y-8">
+                {/* SECTION: MENU MANAGEMENT */}
+                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-black">
+                    <h2 className="text-2xl font-bold mb-6 border-b pb-3 flex items-center gap-2">
+                        <ChevronRight className="h-6 w-6" />
+                        Gestion du Menu (En-tête)
+                    </h2>
+
+                    {/* Add Main Menu Form */}
+                    <form onSubmit={handleAddMenuItem} className="mb-8 bg-gray-50 p-4 rounded-lg">
+                        <h3 className="font-semibold mb-3">Ajouter un Menu Principal</h3>
+                        <div className="flex gap-4 items-end">
+                            <div className="flex-1">
+                                <label className="block text-xs font-medium mb-1 uppercase text-gray-500">Libellé</label>
+                                <input
+                                    type="text"
+                                    value={newMenuItemLabel}
+                                    onChange={(e) => setNewMenuItemLabel(e.target.value)}
+                                    placeholder="Ex: HOMME, FEMME..."
+                                    className="w-full border border-gray-300 rounded px-4 py-2"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block text-xs font-medium mb-1 uppercase text-gray-500">Lien (Optionnel)</label>
+                                <input
+                                    type="text"
+                                    value={newMenuItemLink}
+                                    onChange={(e) => setNewMenuItemLink(e.target.value)}
+                                    placeholder="Ex: /homme"
+                                    className="w-full border border-gray-300 rounded px-4 py-2"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading || !newMenuItemLabel.trim()}
+                                className="bg-black text-white px-6 py-2 rounded font-bold hover:bg-gray-800 disabled:opacity-50 flex items-center gap-2 h-[42px]"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Ajouter
+                            </button>
+                        </div>
+                    </form>
+
+                    {/* Menu Items List */}
+                    <div className="space-y-4">
+                        {menuItems.length === 0 ? (
+                            <p className="text-gray-500 italic text-center py-8">Aucun menu configuré.</p>
+                        ) : (
+                            menuItems.map((item) => (
+                                <div key={item.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                                    {/* Main Item Header */}
+                                    <div className="bg-gray-100 px-4 py-3 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-bold text-lg">{item.label}</span>
+                                            <span className="text-xs text-gray-500 px-2 py-1 bg-white rounded border">{item.link || "#"}</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleDeleteMenuItem(item.id)}
+                                            className="text-red-500 hover:text-red-700 p-2"
+                                            title="Supprimer le menu"
+                                        >
+                                            <Trash2 className="h-5 w-5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Sub Items Section */}
+                                    <div className="p-4 bg-white">
+                                        <div className="pl-6 space-y-2 mb-4">
+                                            {item.children && item.children.length > 0 && item.children.map((sub) => (
+                                                <div key={sub.id} className="flex items-center justify-between group py-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <CornerDownRight className="h-4 w-4 text-gray-400" />
+                                                        <span className="font-medium">{sub.label}</span>
+                                                        <span className="text-xs text-gray-400">({sub.link})</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleDeleteSubMenuItem(sub.id)}
+                                                        className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {(!item.children || item.children.length === 0) && (
+                                                <p className="text-sm text-gray-400 italic pl-6">Aucun sous-lien.</p>
+                                            )}
+                                        </div>
+
+                                        {/* Add Sub Item Input */}
+                                        <div className="pl-6 flex gap-2 items-center">
+                                            <CornerDownRight className="h-4 w-4 text-gray-400" />
+                                            <input
+                                                type="text"
+                                                placeholder="Label sous-lien"
+                                                className="border rounded px-3 py-1 text-sm w-40"
+                                                value={subInputs[item.id]?.label || ""}
+                                                onChange={(e) => setSubInputs(prev => ({
+                                                    ...prev,
+                                                    [item.id]: { ...prev[item.id], label: e.target.value }
+                                                }))}
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Lien (ex: /homme/chemises)"
+                                                className="border rounded px-3 py-1 text-sm w-60"
+                                                value={subInputs[item.id]?.link || ""}
+                                                onChange={(e) => setSubInputs(prev => ({
+                                                    ...prev,
+                                                    [item.id]: { ...prev[item.id], link: e.target.value }
+                                                }))}
+                                            />
+                                            <button
+                                                onClick={() => handleAddSubMenuItem(item.id)}
+                                                disabled={!subInputs[item.id]?.label}
+                                                className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded hover:bg-black disabled:opacity-50"
+                                            >
+                                                Ajouter Sous-lien
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
                 {/* SECTION A: CATEGORY MANAGEMENT */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6 border-b pb-3">Gestion des Catégories</h2>
@@ -322,7 +547,7 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
                     </div>
                 </div>
 
-                {/* SECTION C: TOP BAR MESSAGES */}
+                {/* SECTION D: TOP BAR MESSAGES */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold mb-6 border-b pb-3">Barre d'Annonce (Top Bar)</h2>
 

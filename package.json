@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "next dev",
+    "dev": "node --max-old-space-size=4096 node_modules/next/dist/bin/next dev",
     "build": "npx prisma generate && npx prisma db push --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",

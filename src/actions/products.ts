@@ -48,6 +48,15 @@ export async function addProduct(formData: FormData) {
             console.error("Failed to parse color IDs", e)
         }
 
+        // Handle Sizes Relation
+        const sizesRaw = formData.get("sizes") as string
+        let sizeIds: string[] = []
+        try {
+            sizeIds = sizesRaw ? JSON.parse(sizesRaw) : []
+        } catch (e) {
+            console.error("Failed to parse size IDs", e)
+        }
+
         if (!name || isNaN(price) || images.length === 0 || !category) {
             console.log("Validation failed:", { name, price, images, category })
             return { error: "Champs requis manquants: Nom, Prix, Images ou Catégorie." }
@@ -71,6 +80,9 @@ export async function addProduct(formData: FormData) {
                 isFreeShipping,
                 colors: {
                     connect: colorIds.map(id => ({ id }))
+                },
+                sizes: {
+                    connect: sizeIds.map(id => ({ id }))
                 }
             },
         })
@@ -90,7 +102,10 @@ export async function getProduct(productId: string) {
     try {
         const product = await db.product.findUnique({
             where: { id: productId },
-            include: { colors: true } // Fetch connected colors
+            include: {
+                colors: true, // Fetch connected colors
+                sizes: true   // Fetch connected sizes
+            }
         })
         return { product }
     } catch (error) {
@@ -137,6 +152,15 @@ export async function updateProduct(productId: string, formData: FormData) {
             console.error("Failed to parse color IDs", e)
         }
 
+        // Handle Sizes Relation Update
+        const sizesRaw = formData.get("sizes") as string
+        let sizeIds: string[] = []
+        try {
+            sizeIds = sizesRaw ? JSON.parse(sizesRaw) : []
+        } catch (e) {
+            console.error("Failed to parse size IDs", e)
+        }
+
         // First disconnect all existing colors, then connect new ones (simplest approach for M-N)
         // Or actually, `set` might work if replacing all. 
         // For Prisma set: { set: [{id: 1}, {id: 2}] } replaces entire relation list. Perfect.
@@ -159,6 +183,9 @@ export async function updateProduct(productId: string, formData: FormData) {
                 isFreeShipping,
                 colors: {
                     set: colorIds.map(id => ({ id }))
+                },
+                sizes: {
+                    set: sizeIds.map(id => ({ id }))
                 },
                 customCategorySlug: formData.get("customCategorySlug") as string || null,
             },

@@ -28,6 +28,7 @@ model Product {
   isFreeShipping     Boolean  @default(false)
 
   colors             Color[]
+  sizes              Size[]
   customCategorySlug String?
   homepageLocation   String?  // 'new-in', 'vestiaire-masculin', 'la-maison', null
   createdAt          DateTime @default(now())
@@ -41,6 +42,36 @@ model Color {
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+}
+
+model Size {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  order     Int?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model MenuItem {
+  id        String        @id @default(uuid())
+  label     String
+  link      String
+  order     Int           @default(0)
+  children  SubMenuItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model SubMenuItem {
+  id         String   @id @default(uuid())
+  label      String
+  link       String
+  order      Int      @default(0)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 
