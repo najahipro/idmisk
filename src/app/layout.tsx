@@ -7,7 +7,7 @@ import { CartSheet } from "@/components/cart/cart-sheet";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { CurrencyProvider } from "@/context/currency-context";
-import { StoreLayout } from "@/components/layout/store-layout";
+
 import { Toaster } from "@/components/ui/toaster";
 import { db } from "@/lib/db";
 

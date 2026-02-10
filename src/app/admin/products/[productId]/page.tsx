@@ -15,7 +15,8 @@ export default async function ProductEditPage({ params }: ProductEditPageProps) 
     const { productId } = await params
 
     const product = await db.product.findUnique({
-        where: { id: productId }
+        where: { id: productId },
+        include: { colors: true }
     })
 
     if (!product) {
@@ -32,19 +33,17 @@ export default async function ProductEditPage({ params }: ProductEditPageProps) 
 
     const formattedProduct = {
         ...product,
-        images, // Now passing parsed array
-        // Ensure optional fields are handled strings/nulls logic if needed, 
-        // but Prisma types should match what we expect mostly.
-        // ProductForm expects: initialData: ProductFormValues & { id: string, images: string[] }
-        // Prisma Product has: id, name, ..., images: string[], etc.
-        // We might need to ensure nulls are handled for optional strings
-        colors: product.colors || "",
-        status: product.status as "active" | "draft",
+        images,
+        colors: product.colors ? product.colors.map((c: any) => c.id) : [],
+        status: ((product.status === "active" || product.status === "draft") ? product.status : "active") as "active" | "draft",
+        compareAtPrice: product.compareAtPrice ?? undefined,
+        homepageLocation: ((product.homepageLocation === "NONE" || product.homepageLocation === "ESSENTIALS" || product.homepageLocation === "EDITORIAL" || product.homepageLocation === "NEW_IN") ? product.homepageLocation : "NONE") as "NONE" | "ESSENTIALS" | "EDITORIAL" | "NEW_IN",
+        customCategorySlug: product.customCategorySlug ?? undefined,
     }
 
     return (
-        <div className="max-w-6xl mx-auto pb-10">
+        <div className="max-w-6xl mx-auto pb-10" >
             <ProductForm initialData={formattedProduct} />
-        </div>
+        </div >
     )
 }

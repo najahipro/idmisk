@@ -14,7 +14,7 @@ interface ProductDetailsProps {
 
 export default function ProductDetails({ product, relatedProducts }: ProductDetailsProps) {
     const { formatPrice } = useCurrency()
-    const { addToCart } = useCart()
+    const { addItem } = useCart()
 
     const [selectedSize, setSelectedSize] = useState<string>("M")
     const [selectedImageIndex, setSelectedImageIndex] = useState(0)
@@ -36,14 +36,13 @@ export default function ProductDetails({ product, relatedProducts }: ProductDeta
     const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"]
 
     const handleAddToCart = () => {
-        addToCart({
+        addItem({
             id: product.id,
             title: product.name || product.title,
-            price: typeof product.price === 'string' ? product.price : `${product.price} DH`,
-            priceNum: product.price,
+            price: product.priceNum,
             image: mainImage,
             quantity: quantity,
-            size: selectedSize
+            color: product.colors?.[0]?.name // Default color if available
         })
     }
 
