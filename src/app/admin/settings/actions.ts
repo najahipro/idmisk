@@ -9,9 +9,9 @@ export async function getColors() {
             orderBy: { name: 'asc' }
         })
         return { success: true, colors }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error fetching colors:", error)
-        return { success: false, error: "Failed to fetch colors" }
+        return { success: false, error: error.message || "Failed to fetch colors" }
     }
 }
 
@@ -33,9 +33,9 @@ export async function createColor(name: string, hexCode: string) {
         revalidatePath("/admin/products/[id]", "page") // Generic revalidate attempt
 
         return { success: true, color }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating color:", error)
-        return { success: false, error: "Failed to create color" }
+        return { success: false, error: error.message || "Failed to create color" }
     }
 }
 
@@ -47,9 +47,9 @@ export async function deleteColor(id: string) {
 
         revalidatePath("/admin/settings")
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error deleting color:", error)
-        return { success: false, error: "Failed to delete color" }
+        return { success: false, error: error.message || "Failed to delete color" }
     }
 }
 
@@ -66,9 +66,9 @@ export async function getSizes() {
             ]
         })
         return { success: true, sizes }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error fetching sizes:", error)
-        return { success: false, error: "Failed to fetch sizes" }
+        return { success: false, error: error.message || "Failed to fetch sizes" }
     }
 }
 
@@ -90,9 +90,9 @@ export async function createSize(name: string, order?: number) {
         revalidatePath("/admin/products/[id]", "page")
 
         return { success: true, size }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating size:", error)
-        return { success: false, error: "Failed to create size" }
+        return { success: false, error: error.message || "Failed to create size" }
     }
 }
 
@@ -104,9 +104,9 @@ export async function deleteSize(id: string) {
 
         revalidatePath("/admin/settings")
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error deleting size:", error)
-        return { success: false, error: "Failed to delete size" }
+        return { success: false, error: error.message || "Failed to delete size" }
     }
 }
 
@@ -125,9 +125,9 @@ export async function getMenuItems() {
             }
         })
         return { success: true, menuItems }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error fetching menu items:", error)
-        return { success: false, error: "Failed to fetch menu items" }
+        return { success: false, error: error.message || "Failed to fetch menu items" }
     }
 }
 
@@ -153,9 +153,9 @@ export async function createMenuItem(label: string, link: string) {
         revalidatePath("/admin/settings")
         revalidatePath("/") // Update navbar on home
         return { success: true, menuItem }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating menu item:", error)
-        return { success: false, error: "Failed to create menu item" }
+        return { success: false, error: error.message || "Failed to create menu item" }
     }
 }
 
@@ -167,9 +167,9 @@ export async function deleteMenuItem(id: string) {
         revalidatePath("/admin/settings")
         revalidatePath("/")
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error deleting menu item:", error)
-        return { success: false, error: "Failed to delete menu item" }
+        return { success: false, error: error.message || "Failed to delete menu item" }
     }
 }
 
@@ -196,9 +196,9 @@ export async function createSubMenuItem(menuItemId: string, label: string, link:
         revalidatePath("/admin/settings")
         revalidatePath("/")
         return { success: true, subMenuItem }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating sub-menu item:", error)
-        return { success: false, error: "Failed to create sub-menu item" }
+        return { success: false, error: error.message || "Failed to create sub-menu item" }
     }
 }
 
@@ -210,8 +210,8 @@ export async function deleteSubMenuItem(id: string) {
         revalidatePath("/admin/settings")
         revalidatePath("/")
         return { success: true }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error deleting sub-menu item:", error)
-        return { success: false, error: "Failed to delete sub-menu item" }
+        return { success: false, error: error.message || "Failed to delete sub-menu item" }
     }
 }

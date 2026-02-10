@@ -276,7 +276,7 @@ export default function SettingsClient({ initialCategories, initialSettings, ini
                 setMessage("✅ Messages de la barre d'annonce sauvegardés!")
                 router.refresh()
             } else {
-                setMessage("❌ Erreur lors de la sauvegarde")
+                setMessage(`❌ ${result.error || "Erreur lors de la sauvegarde"}`)
             }
         } catch (error) {
             setMessage("❌ Erreur de connexion")
