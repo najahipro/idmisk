@@ -114,7 +114,7 @@ export function ProductCard({ product }: ProductCardProps) {
                                     ))}
                                 </div>
                             )}
-                            <h3 className="text-sm font-medium text-black group-hover/card:text-black/70 transition-colors leading-tight line-clamp-2">
+                            <h3 className="text-sm font-light text-black group-hover/card:text-black/70 transition-colors leading-tight line-clamp-2">
                                 {product.title}
                             </h3>
                             {product.collectionName && (
@@ -123,7 +123,24 @@ export function ProductCard({ product }: ProductCardProps) {
                                 </p>
                             )}
                         </div>
-                        <p className="text-sm font-medium text-black/80">{formatPrice(product.priceNum)}</p>
+                        <p className="text-sm font-normal text-black/80">{formatPrice(product.priceNum)}</p>
+
+                        {/* Color Dots */}
+                        {product.colors && product.colors.length > 0 && (
+                            <div className="flex gap-1 mt-1 justify-center">
+                                {product.colors.slice(0, 3).map((color: any, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="w-2 h-2 rounded-full border border-black/10"
+                                        style={{ backgroundColor: color.hexCode }}
+                                        title={color.name}
+                                    />
+                                ))}
+                                {product.colors.length > 3 && (
+                                    <span className="text-[9px] text-gray-400 leading-none self-center">+</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

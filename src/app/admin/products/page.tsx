@@ -7,9 +7,14 @@ export const dynamic = "force-dynamic"
 
 export default async function AdminProductsPage() {
     // Fetch products from DB
-    const dbProducts = await db.product.findMany({
-        orderBy: { createdAt: 'desc' },
-    })
+    let dbProducts: any[] = [];
+    try {
+        dbProducts = await db.product.findMany({
+            orderBy: { createdAt: 'desc' },
+        });
+    } catch (error) {
+        console.error("Admin Products DB Error:", error);
+    }
 
     // Map to UI Product type
     const products: Product[] = dbProducts.map((p) => ({

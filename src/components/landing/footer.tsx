@@ -6,37 +6,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 export function Footer() {
     return (
-        <footer className="bg-[#1A3C40] text-white pt-16 pb-8 border-t border-white/10">
+        <footer className="bg-[#EBE9E4] text-black pt-16 pb-8 border-t border-black/10">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20 mb-16">
 
                     {/* Column 1: Aide & Informations */}
                     <div className="space-y-6">
-                        <h4 className="font-serif text-xl font-bold tracking-wide">
+                        <h4 className="font-serif text-xl font-bold tracking-wide text-black">
                             Besoin d'aide ?
                         </h4>
-                        <ul className="space-y-3 text-sm text-gray-300">
+                        <ul className="space-y-3 text-sm text-gray-600">
                             <li>
-                                <Link href="/contact" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/contact" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     Contactez-nous
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/livraison" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/livraison" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     Livraison & Paiement
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/guide-tailles" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/guide-tailles" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     Guide des Tailles
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/faq" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/faq" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     FAQ
                                 </Link>
                             </li>
@@ -45,27 +45,20 @@ export function Footer() {
 
                     {/* Column 2: IDMISK & Partenariat */}
                     <div className="space-y-6">
-                        <h4 className="font-serif text-xl font-bold tracking-wide">
-                            L'Univers IDMISK
+                        <h4 className="font-serif text-xl font-bold tracking-wide text-black">
+                            L'Univers STYLEPSY
                         </h4>
-                        <ul className="space-y-3 text-sm text-gray-300">
+                        <ul className="space-y-3 text-sm text-gray-600">
                             <li>
-                                <Link href="/qui-sommes-nous" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/qui-sommes-nous" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     Qui sommes-nous ?
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/cgv" className="hover:text-white transition-colors flex items-center gap-2 group">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-white transition-colors"></span>
+                                <Link href="/cgv" className="hover:text-black transition-colors flex items-center gap-2 group">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-black/20 group-hover:bg-black transition-colors"></span>
                                     Mentions Légales (CGV)
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/ambassadrice" className="hover:text-white transition-colors flex items-center gap-2 group font-medium text-white/90">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-primary group-hover:bg-white transition-colors"></span>
-                                    Devenir Ambassadrice
-                                    <span className="ml-2 bg-white/20 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Nouveau</span>
                                 </Link>
                             </li>
                         </ul>
@@ -73,10 +66,10 @@ export function Footer() {
 
                     {/* Column 3: Newsletter & Socials */}
                     <div className="space-y-6">
-                        <h4 className="font-serif text-xl font-bold tracking-wide">
+                        <h4 className="font-serif text-xl font-bold tracking-wide text-black">
                             Restez Inspirée
                         </h4>
-                        <p className="text-sm text-gray-300 leading-relaxed">
+                        <p className="text-sm text-gray-600 leading-relaxed">
                             Recevez nos offres exclusives et nouveautés directement dans votre boîte mail.
                         </p>
 
@@ -84,21 +77,21 @@ export function Footer() {
                             <Input
                                 type="email"
                                 placeholder="Votre email"
-                                className="bg-white/5 border-white/10 text-white placeholder:text-gray-400 focus-visible:ring-white/20 h-11"
+                                className="bg-black/5 border-black/10 text-black placeholder:text-gray-500 focus-visible:ring-black/20 h-11"
                             />
-                            <Button className="bg-white text-[#1A3C40] hover:bg-gray-100 h-11 px-6">
+                            <Button className="bg-black text-white hover:bg-zinc-800 h-11 px-6">
                                 S'abonner
                             </Button>
                         </div>
 
                         <div className="flex gap-4 pt-4">
                             {/* Instagram */}
-                            <Link href="https://www.instagram.com/idmisk.ma/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white hover:text-[#1A3C40] text-white p-2.5 rounded-full transition-all duration-300">
+                            <Link href="https://www.instagram.com/idmisk.ma/" target="_blank" rel="noopener noreferrer" className="bg-black/5 hover:bg-black hover:text-white text-black p-2.5 rounded-full transition-all duration-300">
                                 <Instagram className="h-5 w-5" />
                             </Link>
 
                             {/* TikTok */}
-                            <Link href="https://www.tiktok.com/@idmisk7" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white hover:text-[#1A3C40] text-white p-2.5 rounded-full transition-all duration-300">
+                            <Link href="https://www.tiktok.com/@idmisk7" target="_blank" rel="noopener noreferrer" className="bg-black/5 hover:bg-black hover:text-white text-black p-2.5 rounded-full transition-all duration-300">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="20"
@@ -115,7 +108,7 @@ export function Footer() {
                             </Link>
 
                             {/* Pinterest */}
-                            <Link href="https://www.pinterest.com/idmisk/_profile/" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white hover:text-[#1A3C40] text-white p-2.5 rounded-full transition-all duration-300">
+                            <Link href="https://www.pinterest.com/idmisk/_profile/" target="_blank" rel="noopener noreferrer" className="bg-black/5 hover:bg-black hover:text-white text-black p-2.5 rounded-full transition-all duration-300">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="20"
@@ -134,7 +127,7 @@ export function Footer() {
                             </Link>
 
                             {/* Facebook */}
-                            <Link href="https://www.facebook.com/profile.php?id=61585381544195" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white hover:text-[#1A3C40] text-white p-2.5 rounded-full transition-all duration-300">
+                            <Link href="https://www.facebook.com/profile.php?id=61585381544195" target="_blank" rel="noopener noreferrer" className="bg-black/5 hover:bg-black hover:text-white text-black p-2.5 rounded-full transition-all duration-300">
                                 <Facebook className="h-5 w-5" />
                             </Link>
                         </div>
@@ -142,16 +135,16 @@ export function Footer() {
                 </div>
 
                 {/* Bottom: Copyright */}
-                <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+                <div className="border-t border-black/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
                     <p>
-                        © {new Date().getFullYear()} IDMISK. Tous droits réservés.
+                        © {new Date().getFullYear()} STYLEPSY. Tous droits réservés.
                     </p>
                     <div className="flex gap-6">
-                        <Link href="/cgv" className="hover:text-white transition-colors">Mentions Légales</Link>
-                        <Link href="/politique-de-confidentialite" className="hover:text-white transition-colors">Politique de Confidentialité</Link>
+                        <Link href="/cgv" className="hover:text-black transition-colors">Mentions Légales</Link>
+                        <Link href="/politique-de-confidentialite" className="hover:text-black transition-colors">Politique de Confidentialité</Link>
                     </div>
                 </div>
             </div>
-        </footer >
+        </footer>
     );
 }

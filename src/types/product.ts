@@ -9,7 +9,8 @@ export interface Product {
     image: string;
     images?: string[]; // Array of all product images for hover swap
     videoUrl?: string;
-    colors?: { name: string; hex: string }[];
+    colors?: { name: string; hexCode: string }[]; // Updated to match DB
+    sizes?: string[]; // Added for filtering UI
     isNew?: boolean;
     description?: string;
     affiliateEnabled: boolean;
@@ -22,4 +23,5 @@ export interface Product {
     isFreeShipping?: boolean;
     rating?: number; // 0-5
     customCategorySlug?: string;
+    category?: string; // Main category for filtering
 }

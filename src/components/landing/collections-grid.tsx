@@ -39,7 +39,7 @@ export function CollectionsGrid() {
 
     return (
         <section className="container mx-auto px-4 md:px-6 py-12">
-            <h1 className="text-3xl md:text-4xl font-serif font-bold mb-8 text-center">Nos Collections</h1>
+            <h1 className="text-3xl md:text-5xl font-heading font-thin uppercase mb-12 text-center tracking-widest">Nos Collections</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {collections.map((item) => (
@@ -66,7 +66,7 @@ export function CollectionsGrid() {
 
                         <div className="absolute inset-0 flex flex-col justify-end p-6 text-white z-10">
                             <h3 className={cn(
-                                "text-2xl font-light font-serif mb-2 uppercase tracking-widest",
+                                "text-2xl font-thin font-heading mb-2 uppercase tracking-widest",
                                 !item.image && "text-black"
                             )}>
                                 {item.title}

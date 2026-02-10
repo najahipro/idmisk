@@ -11,6 +11,7 @@ const config: Config = {
             fontFamily: {
                 sans: ["var(--font-inter)"],
                 serif: ["var(--font-playfair)"],
+                heading: ["var(--font-oswald)"], // Added for streetwear theme
                 arabic: ["var(--font-arabic)"], // Custom key for Arabic font
             },
             colors: {

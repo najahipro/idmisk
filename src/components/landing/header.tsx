@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link";
-import { MainNav } from "@/components/layout/main-nav";
+
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Search, ShoppingBag, User, Truck, LogOut, Package, X, Menu, Phone, Instagram, Facebook } from "lucide-react";
@@ -70,8 +70,8 @@ export function Header() {
                                 {/* Sheet Header */}
                                 <div className="p-6 border-b">
                                     <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
-                                    <Link href="/" className="font-serif font-bold text-2xl tracking-tighter text-primary">
-                                        IDMISK
+                                    <Link href="/" className="font-heading font-light text-2xl tracking-wide text-black uppercase">
+                                        STYLEPSY
                                     </Link>
                                 </div>
 
@@ -84,28 +84,28 @@ export function Header() {
                                     </SheetClose>
 
                                     <div className="space-y-4">
-                                        <div className="font-bold text-primary">Boutique</div>
-                                        <div className="pl-4 flex flex-col gap-3 text-base text-muted-foreground border-l-2 border-gray-100">
+                                        <div className="font-bold text-primary text-sm uppercase tracking-widest mb-4">Collection</div>
+                                        <div className="pl-4 flex flex-col gap-4 text-base font-light text-black/80 border-l border-gray-100">
                                             <SheetClose asChild>
-                                                <Link href="/products" className="block hover:text-black">Tout les produits</Link>
+                                                <Link href="/products?sort=newest" className="block hover:text-black hover:translate-x-1 transition-transform">Nouveautés</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?category=soie-de-medine" className="block hover:text-black">Soie de Médine</Link>
+                                                <Link href="/products?category=femme" className="block hover:text-black hover:translate-x-1 transition-transform">Femme</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?category=jersey-luxe" className="block hover:text-black">Jersey Luxe</Link>
+                                                <Link href="/products?category=homme" className="block hover:text-black hover:translate-x-1 transition-transform">Homme</Link>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Link href="/products?category=packs" className="block hover:text-black">Coffrets Cadeaux</Link>
+                                                <Link href="/products?category=la-maison" className="block hover:text-black hover:translate-x-1 transition-transform">La Maison</Link>
+                                            </SheetClose>
+                                            <SheetClose asChild>
+                                                <Link href="/products?category=accessoires" className="block hover:text-black hover:translate-x-1 transition-transform">Accessoires</Link>
+                                            </SheetClose>
+                                            <SheetClose asChild>
+                                                <Link href="/products" className="block hover:text-black font-medium mt-2 hover:translate-x-1 transition-transform">Tout voir</Link>
                                             </SheetClose>
                                         </div>
                                     </div>
-
-                                    <SheetClose asChild>
-                                        <Link href="/journal" className="hover:text-primary transition-colors">
-                                            Journal
-                                        </Link>
-                                    </SheetClose>
                                     <SheetClose asChild>
                                         <Link href="/suivi" className="hover:text-primary transition-colors flex items-center gap-2">
                                             <Truck className="w-5 h-5" /> Suivi de commande
@@ -145,65 +145,32 @@ export function Header() {
 
                 {/* 1. Logo (Flex-1 to push center, but on mobile maybe centered?) */}
                 <div className="flex-1 md:flex-none">
-                    <Link href="/" className="font-serif font-bold text-2xl tracking-tighter text-primary">
-                        IDMISK
+                    <Link href="/" className="font-heading font-light text-3xl tracking-wide text-black uppercase">
+                        STYLEPSY
                     </Link>
                 </div>
 
                 {/* 2. Center: Navigation (DESKTOP ONLY) */}
-                <nav className="hidden md:flex flex-1 justify-center items-center gap-8 text-sm font-medium tracking-wide">
-                    <Link href="/" className="hover:text-primary transition-colors flex items-center gap-2 group">
-                        <span>Accueil</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                <nav className="hidden md:flex flex-1 justify-center items-center gap-8 lg:gap-12 text-[13px] font-normal uppercase tracking-[0.2em] text-black">
+                    <Link href="/products?sort=newest" className="relative group hover:text-black/70 transition-colors">
+                        <span>New In</span>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
                     </Link>
-
-                    {/* Mega Menu for Boutique */}
-                    <div className="group relative flex items-center gap-2 cursor-pointer h-20">
-                        <Link href="/products" className="hover:text-primary transition-colors flex items-center gap-2">
-                            <span>Boutique</span>
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                        </Link>
-
-                        {/* Mega Menu Dropdown */}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-[600px] bg-white border border-border shadow-lg rounded-b-lg p-6 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50 flex gap-12">
-                            <div className="flex-1">
-                                <h4 className="font-serif font-bold text-lg mb-4 text-primary">Par Tissu</h4>
-                                <ul className="space-y-3 text-muted-foreground">
-                                    <li><Link href="/products?category=soie-de-medine" className="hover:text-primary transition-colors block p-1">Soie de Médine</Link></li>
-                                    <li><Link href="/products?category=jersey-luxe" className="hover:text-primary transition-colors block p-1">Jersey</Link></li>
-                                    <li><Link href="/products?category=crepe-premium" className="hover:text-primary transition-colors block p-1">Crêpe</Link></li>
-                                    <li><Link href="/products?category=mousseline" className="hover:text-primary transition-colors block p-1">Mousseline</Link></li>
-                                </ul>
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="font-serif font-bold text-lg mb-4 text-primary">Par Style</h4>
-                                <ul className="space-y-3 text-muted-foreground">
-                                    <li><Link href="/products" className="font-bold hover:text-primary transition-colors block p-1">Tout les produits</Link></li>
-                                    <li><Link href="/products?category=hijab" className="hover:text-primary transition-colors block p-1">Hijabs</Link></li>
-                                    <li><Link href="/products?category=khimar" className="hover:text-primary transition-colors block p-1">Khimars</Link></li>
-                                    <li><Link href="/products?category=packs" className="hover:text-primary transition-colors block p-1">Packs Cadeaux</Link></li>
-                                    <li><Link href="/products?category=accessoires" className="hover:text-primary transition-colors block p-1">Accessoires</Link></li>
-                                </ul>
-                            </div>
-                            <div className="flex-1 bg-muted/30 rounded-lg p-4 flex flex-col items-center justify-center text-center group/featured cursor-pointer" onClick={() => router.push('/products?sort=newest')}>
-                                <div className="relative w-full aspect-[4/3] mb-3 overflow-hidden rounded-md">
-                                    {/* Simple decorative placeholder if no specific image is available */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-primary/5 group-hover/featured:scale-105 transition-transform duration-500" />
-                                    <div className="absolute inset-0 flex items-center justify-center text-primary/20">
-                                        <ShoppingBag className="w-12 h-12" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <p className="font-serif font-bold text-primary mb-1 group-hover/featured:underline decoration-primary/50 underline-offset-4 transition-all">Nouveautés</p>
-                                    <span className="text-xs text-muted-foreground">Découvrir la collection</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <Link href="/journal" className="hover:text-primary transition-colors flex items-center gap-2 group">
-                        <span>Journal</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <Link href="/products?category=femme" className="relative group hover:text-black/70 transition-colors">
+                        <span>Femme</span>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link href="/products?category=homme" className="relative group hover:text-black/70 transition-colors">
+                        <span>Homme</span>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link href="/products?category=la-maison" className="relative group hover:text-black/70 transition-colors">
+                        <span>La Maison</span>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link href="/products?category=accessoires" className="relative group hover:text-black/70 transition-colors">
+                        <span>Accessoires</span>
+                        <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-black transition-all duration-300 group-hover:w-full"></span>
                     </Link>
                 </nav>
 

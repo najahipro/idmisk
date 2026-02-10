@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Tajawal } from "next/font/google";
+import { Inter, Tajawal, Oswald } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/cart-context";
 import { OrderProvider } from "@/context/order-context";
@@ -7,20 +7,19 @@ import { CartSheet } from "@/components/cart/cart-sheet";
 import { SessionProvider } from "@/components/auth/session-provider";
 import { I18nProvider } from "@/components/i18n-provider";
 import { CurrencyProvider } from "@/context/currency-context";
-import { Header } from "@/components/landing/header";
-import { TopBar } from "@/components/landing/top-bar";
-import { Footer } from "@/components/landing/footer";
-import { WhatsAppButton } from "@/components/ui/whatsapp-button";
+import { StoreLayout } from "@/components/layout/store-layout";
 import { Toaster } from "@/components/ui/toaster";
+import { db } from "@/lib/db";
 
 // 1. هنا زدنا المكتبة ديال جوجل أناليتكس
 import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 const tajawal = Tajawal({ subsets: ["arabic"], weight: ["400", "500", "700"], variable: "--font-arabic" });
 
 export const metadata: Metadata = {
-    title: "IDMISK - L'élégance Modeste",
+    title: "STYLEPSY - L'élégance Modeste",
     description: "Vente de Hijabs et Accessoires Premium au Maroc",
     icons: {
         icon: '/icon.png',
@@ -35,32 +34,21 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="fr" suppressHydrationWarning>
-            <body className={`${inter.variable} ${tajawal.variable} font-sans bg-background text-foreground antialiased`}>
+            <body className={`${inter.variable} ${oswald.variable} ${tajawal.variable} font-sans bg-background text-foreground antialiased`}>
                 <I18nProvider>
                     <CurrencyProvider>
                         <SessionProvider>
                             <CartProvider>
                                 <OrderProvider>
-                                    <div className="flex flex-col min-h-screen">
-                                        <TopBar />
-                                        <Header />
-                                        <main className="flex-1">
-                                            {children}
-                                        </main>
-                                        <Footer />
-                                    </div>
-                                    <CartSheet />
-                                    <WhatsAppButton />
+                                    {children}
                                     <Toaster />
                                 </OrderProvider>
                             </CartProvider>
                         </SessionProvider>
                     </CurrencyProvider>
                 </I18nProvider>
+                <GoogleAnalytics gaId="G-XXXXXXXXXX" />
             </body>
-
-            {/* 2. هنا حطينا الكومبوننت ديال التتبع بالكود ديالك */}
-            <GoogleAnalytics gaId="G-P24TYY6X8D" />
         </html>
     );
 }

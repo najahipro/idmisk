@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import * as z from "zod"
 import { Plus, Loader2, Save, ArrowLeft, Trash, Truck, AlertCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -33,12 +33,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 import { addProduct, updateProduct } from "@/actions/products"
 
-const SIMPLE_CATEGORIES = [
-    "Hijabs",
-    "Khimars",
-    "Packs Exclusifs",
-    "Accessoires"
-];
+import { getColors } from "@/app/admin/settings/actions"
+
+// Categories and Colors will be fetched dynamically
 
 const formSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
@@ -52,43 +49,76 @@ const formSchema = z.object({
     isFeatured: z.boolean().default(false),
     isNewArrival: z.boolean().default(false),
     isFreeShipping: z.boolean().default(false),
-    colors: z.string().nullish(),
+    homepageLocation: z.enum(["NONE", "ESSENTIALS", "EDITORIAL", "NEW_IN"]).default("NONE"),
+    colors: z.array(z.string()).default([]), // Now an array of ID strings
     customCategorySlug: z.string().nullish(),
 })
 
 type ProductFormValues = z.infer<typeof formSchema>
 
 interface ProductFormProps {
-    initialData?: ProductFormValues & { id: string, images: string[] } | null
+    initialData?: (ProductFormValues & { id: string, images: string[], colors?: any[] }) | null
 }
 
 export function ProductForm({ initialData }: ProductFormProps) {
     const router = useRouter()
+    const [categories, setCategories] = useState<Array<{ id: string, name: string }>>([])
+    const [colors, setColors] = useState<Array<{ id: string, name: string, hexCode: string }>>([])
+    const [loadingData, setLoadingData] = useState(true)
 
     const isEdit = !!initialData
     const title = isEdit ? "Modifier le produit" : "Ajouter un produit"
     const action = isEdit ? "Enregistrer" : "Créer le produit"
+
+    // Fetch categories and colors from database
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                // Fetch Categories
+                const catResponse = await fetch('/api/admin/categories')
+                const catResult = await catResponse.json()
+                if (catResult.success && catResult.data) {
+                    setCategories(catResult.data)
+                }
+
+                // Fetch Colors
+                const colorsResult = await getColors()
+                if (colorsResult.success && colorsResult.colors) {
+                    setColors(colorsResult.colors)
+                }
+            } catch (error) {
+                console.error('Failed to fetch data:', error)
+            } finally {
+                setLoadingData(false)
+            }
+        }
+        fetchData()
+    }, [])
 
     const defaultValues = initialData ? {
         ...initialData,
         price: parseFloat(String(initialData.price)),
         compareAtPrice: initialData.compareAtPrice ? parseFloat(String(initialData.compareAtPrice)) : 0,
         images: initialData.images || [],
-        category: SIMPLE_CATEGORIES.includes(initialData.category) ? initialData.category : "Hijabs",
+        category: initialData.category || "",
         isFreeShipping: initialData.isFreeShipping || false,
+        homepageLocation: (initialData as any).homepageLocation || "NONE",
+        // Map initial colors array (objects) to IDs array
+        colors: initialData.colors ? initialData.colors.map((c: any) => c.id) : [],
     } : {
         name: "",
         description: "",
         price: 0,
         compareAtPrice: 0,
         stock: 0,
-        category: "Hijabs",
+        category: "",
         images: [],
         status: "active",
         isFeatured: false,
         isNewArrival: false,
         isFreeShipping: false,
-        colors: "",
+        homepageLocation: "NONE",
+        colors: [],
         customCategorySlug: "",
     }
 
@@ -118,12 +148,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
         formData.append("customCategorySlug", values.customCategorySlug ?? "")
 
         formData.append("images", JSON.stringify(values.images))
-        formData.append("colors", values.colors || "")
+
+        // Pass colors as JSON string of IDs
+        formData.append("colors", JSON.stringify(values.colors))
+
         formData.append("status", values.status)
 
         formData.append("isFeatured", values.isFeatured ? "on" : "off")
         formData.append("isNewArrival", values.isNewArrival ? "on" : "off")
         formData.append("isFreeShipping", values.isFreeShipping ? "on" : "off")
+        formData.append("homepageLocation", values.homepageLocation || "NONE")
 
         const showOnHome = values.status === "active"
         formData.append("showOnHome", showOnHome ? "on" : "off")
@@ -150,6 +184,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
         }
     }
 
+    // Handle Color Toggle
+    const toggleColor = (colorId: string) => {
+        const currentColors = form.getValues("colors") || []
+        const newColors = currentColors.includes(colorId)
+            ? currentColors.filter(id => id !== colorId)
+            : [...currentColors, colorId]
+
+        form.setValue("colors", newColors, { shouldDirty: true })
+    }
+
     return (
         <div className="space-y-4">
             {isEdit && (
@@ -170,12 +214,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                             <AlertCircle className="h-4 w-4 text-red-600" />
                             <AlertTitle className="text-red-800">Attention</AlertTitle>
                             <AlertDescription className="text-red-700">
-                                Le formulaire contient des erreurs. Vérifiez les champs suivants :
-                                <ul className="list-disc pl-4 mt-2">
-                                    {Object.entries(errors).map(([key, error]) => (
-                                        <li key={key} className="capitalize">{key}: {error?.message as string}</li>
-                                    ))}
-                                </ul>
+                                Le formulaire contient des erreurs.
                             </AlertDescription>
                         </Alert>
                     )}
@@ -206,7 +245,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 <FormLabel>Description</FormLabel>
                                                 <FormControl>
                                                     <Textarea
-                                                        placeholder="Description détaillée (Utilisez 'Entrée' pour les sauts de ligne)..."
+                                                        placeholder="Description..."
                                                         className="min-h-[150px]"
                                                         {...field}
                                                     />
@@ -245,6 +284,51 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                         }}
                                                     />
                                                 </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            {/* Colors Section */}
+                            <Card className="bg-white border-border shadow-sm">
+                                <CardHeader>
+                                    <CardTitle>Couleurs Disponibles</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <FormField
+                                        control={form.control}
+                                        name="colors"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                                                    {loadingData ? (
+                                                        <p className="text-sm text-gray-500 col-span-3">Chargement des couleurs...</p>
+                                                    ) : colors.length === 0 ? (
+                                                        <div className="col-span-full text-sm text-gray-500">
+                                                            Aucune couleur disponible. Ajoutez-en dans les Réglages.
+                                                        </div>
+                                                    ) : colors.map((color) => {
+                                                        const isSelected = (field.value || []).includes(color.id)
+                                                        return (
+                                                            <div
+                                                                key={color.id}
+                                                                onClick={() => toggleColor(color.id)}
+                                                                className={`
+                                                                    cursor-pointer border rounded-lg p-2 flex flex-col items-center gap-2 transition-all
+                                                                    ${isSelected ? 'border-black bg-black/5 ring-1 ring-black' : 'border-gray-200 hover:border-gray-300'}
+                                                                `}
+                                                            >
+                                                                <div
+                                                                    className="w-6 h-6 rounded-full border border-black/10"
+                                                                    style={{ backgroundColor: color.hexCode }}
+                                                                />
+                                                                <span className="text-xs font-medium text-center truncate w-full">{color.name}</span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -331,11 +415,47 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {SIMPLE_CATEGORIES.map((cat) => (
-                                                            <SelectItem key={cat} value={cat}>
-                                                                {cat}
-                                                            </SelectItem>
-                                                        ))}
+                                                        {loadingData ? (
+                                                            <SelectItem value="_loading" disabled>Chargement...</SelectItem>
+                                                        ) : categories.length === 0 ? (
+                                                            <SelectItem value="_empty" disabled>Aucune catégorie (Allez dans Réglages)</SelectItem>
+                                                        ) : (
+                                                            categories.map((cat) => (
+                                                                <SelectItem key={cat.id} value={cat.name}>
+                                                                    {cat.name}
+                                                                </SelectItem>
+                                                            ))
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-white border-border shadow-sm">
+                                <CardHeader>
+                                    <CardTitle>Emplacement sur l'Accueil</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <FormField
+                                        control={form.control}
+                                        name="homepageLocation"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Choisir..." />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="NONE">Aucun (Par défaut)</SelectItem>
+                                                        <SelectItem value="ESSENTIALS">NOS ESSENTIELS</SelectItem>
+                                                        <SelectItem value="EDITORIAL">VESTIAIRE MASCULIN</SelectItem>
+                                                        <SelectItem value="NEW_IN">NEW IN</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <FormMessage />

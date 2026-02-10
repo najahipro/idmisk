@@ -60,7 +60,7 @@ export function OrdersClient({ orders }: OrdersClientProps) {
                     <RefreshCw className="mr-2 h-4 w-4" /> Actualiser
                 </Button>
             </div>
-            <div className="rounded-md border bg-card text-card-foreground shadow-sm">
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <Table>
                     <TableHeader>
                         <TableRow>

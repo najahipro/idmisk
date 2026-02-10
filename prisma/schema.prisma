@@ -1,11 +1,12 @@
-// 1. GENERATOR (Bqa kifma howa)
+// 1. GENERATOR
 generator client {
   provider = "prisma-client-js"
 }
-// 2. DATASOURCE (Hna fin kan l-ghalat - Daba salla7nah l Postgres)
+
+// 2. DATASOURCE - Using SQLite for local development
 datasource db {
- provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // 3. MODELS (Tables dyalk kamlin)
@@ -25,10 +26,21 @@ model Product {
   showOnHome         Boolean  @default(false)
   isNewArrival       Boolean  @default(false)
   isFreeShipping     Boolean  @default(false)
-  colors             String?
+
+  colors             Color[]
   customCategorySlug String?
+  homepageLocation   String?  // 'new-in', 'vestiaire-masculin', 'la-maison', null
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model Color {
+  id        String    @id @default(uuid())
+  name      String
+  hexCode   String
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 
@@ -68,6 +80,54 @@ model Article {
   date      DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model HomeLayout {
+  id        String   @id @default(uuid())
+  
+  // 1. Hero Section (Top Main)
+  heroImage       String?
+  heroTitle       String?
+  heroSubtitle    String?
+  heroButtonText  String?  @default("Découvrir")
+  
+  // 2. Middle Banner
+  middleImage     String?
+  middleTitle     String?
+  middleCategory  String?  // 'new-in', 'femme', 'homme', 'la-maison', 'accessoires', 'shop'
+  
+  // 3. Split Banner Left (La Maison)
+  splitLeftImage    String?
+  splitLeftTitle    String?
+  splitLeftCategory String?
+  
+  // 4. Split Banner Right (Accessoires)
+  splitRightImage    String?
+  splitRightTitle    String?
+  splitRightCategory String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSettings {
+  id                String   @id @default(uuid())
+  middleBannerImage String?
+  middleBannerTitle String?
+  middleBannerLink  String?
+  topBarMessage1    String?
+  topBarMessage2    String?
+  topBarMessage3    String?
+  updatedAt         DateTime @updatedAt
 }
 
 model HomeUnivers {

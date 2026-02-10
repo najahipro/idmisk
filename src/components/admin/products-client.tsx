@@ -176,7 +176,7 @@ export function ProductsClient({ initialProducts }: ProductsClientProps) {
             <Separator className="my-8" />
 
             {/* SECTION 2: PRODUCT LIST */}
-            <div className="space-y-4">
+            <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
                 <h2 className="text-2xl font-bold">Liste des Produits</h2>
                 <DataTable columns={columns} data={initialProducts} searchKey="name" />
             </div>

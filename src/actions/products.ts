@@ -38,7 +38,15 @@ export async function addProduct(formData: FormData) {
         const showOnHome = formData.get("showOnHome") === "on"
         const isNewArrival = formData.get("isNewArrival") === "on"
         const isFreeShipping = formData.get("isFreeShipping") === "on"
-        const colors = formData.get("colors") as string
+
+        // Handle Colors Relation
+        const colorsRaw = formData.get("colors") as string
+        let colorIds: string[] = []
+        try {
+            colorIds = colorsRaw ? JSON.parse(colorsRaw) : []
+        } catch (e) {
+            console.error("Failed to parse color IDs", e)
+        }
 
         if (!name || isNaN(price) || images.length === 0 || !category) {
             console.log("Validation failed:", { name, price, images, category })
@@ -61,7 +69,9 @@ export async function addProduct(formData: FormData) {
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
-                colors,
+                colors: {
+                    connect: colorIds.map(id => ({ id }))
+                }
             },
         })
         console.log("Product created ID:", newProduct.id)
@@ -79,7 +89,8 @@ export async function addProduct(formData: FormData) {
 export async function getProduct(productId: string) {
     try {
         const product = await db.product.findUnique({
-            where: { id: productId }
+            where: { id: productId },
+            include: { colors: true } // Fetch connected colors
         })
         return { product }
     } catch (error) {
@@ -116,7 +127,19 @@ export async function updateProduct(productId: string, formData: FormData) {
         const showOnHome = formData.get("showOnHome") === "on"
         const isNewArrival = formData.get("isNewArrival") === "on"
         const isFreeShipping = formData.get("isFreeShipping") === "on"
-        const colors = formData.get("colors") as string
+
+        // Handle Colors Relation Update
+        const colorsRaw = formData.get("colors") as string
+        let colorIds: string[] = []
+        try {
+            colorIds = colorsRaw ? JSON.parse(colorsRaw) : []
+        } catch (e) {
+            console.error("Failed to parse color IDs", e)
+        }
+
+        // First disconnect all existing colors, then connect new ones (simplest approach for M-N)
+        // Or actually, `set` might work if replacing all. 
+        // For Prisma set: { set: [{id: 1}, {id: 2}] } replaces entire relation list. Perfect.
 
         await db.product.update({
             where: { id: productId },
@@ -134,7 +157,9 @@ export async function updateProduct(productId: string, formData: FormData) {
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
-                colors,
+                colors: {
+                    set: colorIds.map(id => ({ id }))
+                },
                 customCategorySlug: formData.get("customCategorySlug") as string || null,
             },
         })

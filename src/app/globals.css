@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: #fdfbf7;
-    /* Very Light Cream */
-    --foreground: #333333;
-    /* Dark Charcoal */
+    --background: #F5F3EB;
+    /* Vintage Cream */
+    --foreground: #1A1A1A;
+    /* Soft Black */
 
     --primary: #7da2a9;
     /* Dusty Blue */
