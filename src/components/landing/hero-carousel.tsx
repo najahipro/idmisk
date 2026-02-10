@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import cloudinaryLoader from "@/lib/cloudinary-loader"
 
 export function HeroCarousel() {
     return (
@@ -10,10 +11,12 @@ export function HeroCarousel() {
             {/* Static Hero Image */}
             <Image
                 src="/idmisk.jpg"
+                loader={cloudinaryLoader}
                 alt="IDMISK Collection"
                 fill
                 className="object-cover"
                 priority
+                sizes="100vw"
             />
 
             {/* Subtle Gradient Overlay for Text Readability */}

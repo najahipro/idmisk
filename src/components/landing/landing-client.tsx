@@ -7,6 +7,7 @@ import { DualCategoryBanner } from "@/components/landing/dual-category-banner"
 import Link from "next/link"
 import Image from "next/image"
 import { MensEditorialGrid } from "@/components/landing/mens-editorial-grid"
+import cloudinaryLoader from "@/lib/cloudinary-loader"
 
 interface HomeLayout {
     heroImage?: string | null
@@ -48,10 +49,12 @@ export default function LandingPageClient({
                         homeLayout.heroImage.startsWith('data:') ? (
                             <Image
                                 src={homeLayout.heroImage}
+                                loader={cloudinaryLoader}
                                 alt={homeLayout.heroTitle || "Modest Fashion Collection"}
                                 fill
                                 priority
                                 className="object-cover object-center"
+                                sizes="100vw"
                             />
                         ) : (
                             <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-red-500 text-white text-2xl font-bold">
@@ -99,10 +102,12 @@ export default function LandingPageClient({
                         homeLayout.middleImage.startsWith('data:') ? (
                             <Image
                                 src={homeLayout.middleImage}
+                                loader={cloudinaryLoader}
                                 alt={homeLayout.middleTitle || "Collection"}
                                 fill
                                 loading="lazy"
                                 className="object-cover object-center"
+                                sizes="100vw"
                             />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center bg-red-500 text-white text-2xl font-bold">

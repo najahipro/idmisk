@@ -375,15 +375,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                     </div>
 
                                                     <div className="flex flex-wrap gap-2">
-                                                        {(field.value || []).map((size: string) => (
+                                                        {(field.value || []).map((size: string, index: number) => (
                                                             <div
-                                                                key={size}
+                                                                key={`${size}-${index}`}
                                                                 className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2"
                                                             >
                                                                 {size}
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => field.onChange(field.value.filter((s: string) => s !== size))}
+                                                                    onClick={() => {
+                                                                        const newSizes = [...field.value];
+                                                                        newSizes.splice(index, 1);
+                                                                        field.onChange(newSizes);
+                                                                    }}
                                                                     className="hover:text-red-300"
                                                                 >
                                                                     <Trash className="h-3 w-3" />

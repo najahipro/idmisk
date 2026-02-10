@@ -57,6 +57,9 @@ export async function addProduct(formData: FormData) {
             console.error("Failed to parse size IDs", e)
         }
 
+        const homepageLocationRaw = formData.get("homepageLocation") as string
+        const homepageLocation = (homepageLocationRaw && homepageLocationRaw !== "NONE") ? homepageLocationRaw : null
+
         if (!name || isNaN(price) || images.length === 0 || !category) {
             console.log("Validation failed:", { name, price, images, category })
             return { error: "Champs requis manquants: Nom, Prix, Images ou Catégorie." }
@@ -78,6 +81,7 @@ export async function addProduct(formData: FormData) {
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
+                homepageLocation,
                 colors: {
                     connect: colorIds.map(id => ({ id }))
                 },
@@ -168,6 +172,10 @@ export async function updateProduct(productId: string, formData: FormData) {
         // Or actually, `set` might work if replacing all. 
         // For Prisma set: { set: [{id: 1}, {id: 2}] } replaces entire relation list. Perfect.
 
+        // Handle Homepage Location
+        const homepageLocationRaw = formData.get("homepageLocation") as string
+        const homepageLocation = (homepageLocationRaw && homepageLocationRaw !== "NONE") ? homepageLocationRaw : null
+
         await db.product.update({
             where: { id: productId },
             data: {
@@ -184,6 +192,7 @@ export async function updateProduct(productId: string, formData: FormData) {
                 showOnHome,
                 isNewArrival,
                 isFreeShipping,
+                homepageLocation,
                 colors: {
                     set: colorIds.map(id => ({ id }))
                 },

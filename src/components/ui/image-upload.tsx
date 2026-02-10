@@ -79,7 +79,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         <div>
             <Script
                 src="https://widget.cloudinary.com/v2.0/global/all.js"
-                strategy="beforeInteractive"
+                strategy="lazyOnload"
                 onLoad={() => console.log("Cloudinary Script Loaded via next/script")}
                 onError={(e) => console.error("Cloudinary Script Failed to Load", e)}
             />

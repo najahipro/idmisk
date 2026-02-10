@@ -34,8 +34,8 @@ export function StreetwearProductGrid({ products, title = "Streetwear Essentials
                     <h2 className="text-3xl md:text-5xl font-heading font-thin uppercase mb-4 tracking-wide">
                         {title}
                     </h2>
-                    <p className="text-red-600 font-medium">
-                        No products found. (Database might be disconnected or empty)
+                    <p className="text-gray-400 font-medium italic">
+                        Prochainement disponible.
                     </p>
                 </div>
             </section>

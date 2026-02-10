@@ -4,7 +4,12 @@
     "build": "npx prisma generate && npx prisma db push --accept-data-loss && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:dump": "npx tsx scripts/dump-data.ts",
+    "db:seed": "npx prisma db seed"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

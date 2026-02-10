@@ -18,23 +18,35 @@ import { Product } from "@/types/product"
 
 interface ProductListClientProps {
     initialProducts: Product[]
+    categories: any[]
+    sizes: any[]
+    colors: any[]
 }
 
-export function ProductListClient({ initialProducts }: ProductListClientProps) {
+export function ProductListClient({ initialProducts, categories, sizes, colors }: ProductListClientProps) {
     const searchParams = useSearchParams()
 
     const [selectedFabric, setSelectedFabric] = useState<string | null>(null)
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+    const [selectedSize, setSelectedSize] = useState<string | null>(null)
+    const [selectedColor, setSelectedColor] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState<string | null>(null)
 
     // Sync state with URL params on mount/update
     useEffect(() => {
         const fabricParam = searchParams.get("fabric")
         const categoryParam = searchParams.get("category")
+        const sizeParam = searchParams.get("size")
+        const colorParam = searchParams.get("color")
         const searchParam = searchParams.get("search")
 
         if (fabricParam) setSelectedFabric(fabricParam)
         if (categoryParam) setSelectedCategory(categoryParam)
+        if (sizeParam) setSelectedSize(sizeParam)
+        else setSelectedSize(null)
+        if (colorParam) setSelectedColor(colorParam)
+        else setSelectedColor(null)
+
         if (searchParam) setSearchQuery(searchParam)
         else setSearchQuery(null) // Clear if param removed
     }, [searchParams])
@@ -102,10 +114,51 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
             if (!matchesCategory && !matchesCustom) return false
         }
 
+        // Size Filter
+        if (selectedSize) {
+            if (!product.sizes || product.sizes.length === 0) return false
+            if (!product.sizes.includes(selectedSize)) return false
+        }
+
+        // Color Filter
+        if (selectedColor) {
+            if (!product.colors || product.colors.length === 0) return false
+            // selectedColor is the Color ID. product.colors has {name, hexCode} but NOT ID usually in the UI mapped object?
+            // Wait, `mapToUiProduct` maps colors to `{ name, hexCode }`. It DOES NOT include ID.
+            // We need to fix `mapToUiProduct` in `page.tsx` to include ID if we want to filter by ID.
+            // OR we filter by Color Name if we change `ProductFilters` to pass name? 
+            // ProductFilters uses ID for key and selection.
+            // Let's check `Product` type. `colors?: { name: string; hexCode: string }[]`.
+
+            // Quick fix: Map UI product colors to include ID or filter by name match if possible.
+            // But `colors` prop from DB has ID.
+            // Let's assume we match by Name if ID is missing? 
+            // The Color object in `product-filters` comes from DB `colors` (has ID, name, hex).
+            // The `product.colors` comes from UI mapping `p.colors.map(...)`.
+
+            // Let's check `page.tsx` map function. 
+            // It maps `p.colors.map((c: any) => ({ name: c.name, hexCode: c.hexCode }))`.
+            // ID is missing!
+
+            // Option 1: Update `page.tsx` to include ID in `Product` type and mapping. (Best)
+            // Option 2: Filter by name finding the name from `colors` array using `selectedColor` ID.
+
+            // I'll choose Option 2 for now to minimize `Product` type changes if unnecessary, 
+            // BUT `Product` type is shared. Adding ID is cleaner.
+
+            // Let's try finding the color name from the `colors` prop passed to this component.
+            const selectedColorObj = colors.find((c: any) => c.id === selectedColor)
+            if (selectedColorObj) {
+                const selectedName = selectedColorObj.name.toLowerCase()
+                const hasColor = product.colors.some(c => c.name.toLowerCase() === selectedName)
+                if (!hasColor) return false
+            }
+        }
+
         return true
     })
 
-    const activeFiltersCount = (selectedFabric ? 1 : 0) + (selectedCategory ? 1 : 0)
+    const activeFiltersCount = (selectedFabric ? 1 : 0) + (selectedCategory ? 1 : 0) + (selectedSize ? 1 : 0) + (selectedColor ? 1 : 0)
 
     return (
         <div className="w-full md:px-12">
@@ -146,6 +199,13 @@ export function ProductListClient({ initialProducts }: ProductListClientProps) {
                                     setSelectedFabric={setSelectedFabric}
                                     selectedCategory={selectedCategory}
                                     setSelectedCategory={setSelectedCategory}
+                                    categories={categories}
+                                    sizes={sizes}
+                                    colors={colors}
+                                    selectedSize={selectedSize}
+                                    setSelectedSize={setSelectedSize}
+                                    selectedColor={selectedColor}
+                                    setSelectedColor={setSelectedColor}
                                     inSheet={true}
                                 />
                             </div>

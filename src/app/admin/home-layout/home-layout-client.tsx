@@ -140,7 +140,7 @@ export default function HomeLayoutClient({ initialData }: HomeLayoutClientProps)
                             <label className="block text-sm font-medium mb-2">Aperçu</label>
                             <div className="aspect-[16/9] bg-gray-100 rounded overflow-hidden relative">
                                 {formData.heroImage ? (
-                                    <Image src={formData.heroImage} alt="Hero Preview" fill className="object-cover" />
+                                    <Image src={formData.heroImage} alt="Hero Preview" fill className="object-cover" sizes="100vw" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-400">
                                         Aucune image
@@ -190,7 +190,7 @@ export default function HomeLayoutClient({ initialData }: HomeLayoutClientProps)
                             <label className="block text-sm font-medium mb-2">Aperçu</label>
                             <div className="aspect-[21/9] bg-gray-100 rounded overflow-hidden relative">
                                 {formData.middleImage ? (
-                                    <Image src={formData.middleImage} alt="Middle Preview" fill className="object-cover" />
+                                    <Image src={formData.middleImage} alt="Middle Preview" fill className="object-cover" sizes="100vw" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-gray-400">
                                         Aucune image
