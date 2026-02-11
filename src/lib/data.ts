@@ -1,13 +1,9 @@
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 
-export const getHomeLayout = unstable_cache(
-    async () => {
-        return await db.homeLayout.findFirst();
-    },
-    ["home-layout"],
-    { revalidate: 3600 }
-);
+export const getHomeLayout = async () => {
+    return await db.homeLayout.findFirst();
+};
 
 export const getSiteSettings = unstable_cache(
     async () => {
